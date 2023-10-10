@@ -1,8 +1,9 @@
 package docx_test
 
 import (
+	"fmt"
 	"log"
-	"os"
+	"sync"
 	"testing"
 
 	"projects/doc/doc_service/pkg/transport"
@@ -10,37 +11,52 @@ import (
 )
 
 func TestTDocx_Perform(t *testing.T) {
-	tr, err := transport.NewTransport("127.0.0.1:8030")
-	if err != nil {
-		log.Println("создание транспорта", err)
+	var wg sync.WaitGroup
+
+	for index := 0; index < 10; index++ {
+		testWork(&wg, fmt.Sprintf("work_%v", index))
 	}
+	wg.Wait()
+}
 
-	res, err := tr.DocxPerform("1", methods.TParams{NameFile: "test", ConvertPDF: true, Rotation: true},
-		map[string]interface{}{
-			"col_labels": []string{"fruit", "vegetable", "stone", "thing"},
-			"tbl_contents": []interface{}{
-				map[string]interface{}{"label": "yellow", "cols": []string{"banana", "capsicum", "pyrite", "taxi"}},
-				map[string]interface{}{"label": "red", "cols": []string{"apple", "tomato", "cinnabar", "doubledecker"}},
-				map[string]interface{}{"label": "green", "cols": []string{"guava", "cucumber", "aventurine", "card"}},
-			},
-		})
+func testWork(wg *sync.WaitGroup, name string) {
+	wg.Add(1)
+	go func(wg *sync.WaitGroup, name string) {
+		tr, err := transport.NewTransport("127.0.0.1:8030")
+		if err != nil {
+			log.Println("создание транспорта", err)
+		}
 
-	if err != nil {
-		log.Println("Отправка данных", err)
-	}
+		for index := 0; index < 100_000; index++ {
 
-	if res == nil {
-		return
-	}
+			res, err := tr.DocxPerform("1", methods.TParams{NameFile: fmt.Sprintf("test_%v_%v", name, index), ConvertPDF: false, Rotation: false},
+				map[string]interface{}{
+					"col_labels": []string{"fruit", "vegetable", "stone", "thing"},
+					"tbl_contents": []interface{}{
+						map[string]interface{}{"label": "yellow", "cols": []string{"banana", "capsicum", "pyrite", "taxi"}},
+						map[string]interface{}{"label": "red", "cols": []string{"apple", "tomato", "cinnabar", "doubledecker"}},
+						map[string]interface{}{"label": "green", "cols": []string{"guava", "cucumber", "aventurine", "card"}},
+					},
+				})
 
-	f, err := os.Create(res.Name + "." + res.Ext)
-	if err != nil {
-		log.Println("создание файла", err)
-	}
+			if err != nil {
+				log.Println("Отправка данных", err)
+			}
 
-	f.Write(res.FileData)
+			if res == nil {
+				return
+			}
 
-	f.Close()
+			// f, err := os.Create(filepath.Join("res", res.Name+"."+res.Ext))
+			// if err != nil {
+			// 	log.Println("создание файла", err)
+			// }
 
-	log.Println(res.Ext)
+			// f.Write(res.FileData)
+
+			// f.Close()
+
+		}
+		wg.Done()
+	}(wg, name)
 }

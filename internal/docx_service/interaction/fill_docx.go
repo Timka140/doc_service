@@ -45,8 +45,10 @@ func (t *TDocxInteraction) FillDocx() (IFillDocx, error) {
 		return nil, fmt.Errorf("TDocxInteraction.FillDocx() открытие канала, err=%w", err)
 	}
 
+	// var err error
 	fillDocx := &TFillDocx{
-		ch:         ch,
+		ch: ch,
+		// ch:         t.ch,
 		servicePid: uuid.NewString(),
 	}
 
@@ -143,15 +145,15 @@ func (t *TFillDocx) Result(fn func(data *TDocxOut)) error {
 	}()
 	t.wg.Wait()
 
-	err = t.ch.Cancel("", true)
-	if err != nil {
-		return fmt.Errorf("TFillDocx.Result(): прерывание канала, err=%w", err)
-	}
-
-	// err = t.ch.Close()
+	// err = t.ch.Cancel("", true)
 	// if err != nil {
-	// 	return fmt.Errorf("TFillDocx.Result(): закрытие канала, err=%w", err)
+	// 	return fmt.Errorf("TFillDocx.Result(): прерывание канала, err=%w", err)
 	// }
+
+	err = t.ch.Close()
+	if err != nil {
+		return fmt.Errorf("TFillDocx.Result(): закрытие канала, err=%w", err)
+	}
 
 	return nil
 }
