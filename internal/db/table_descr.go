@@ -20,3 +20,10 @@ type Tasks struct {
 	Name    string
 	Comment string
 }
+
+type Task struct {
+	Id       int64
+	PathBase string
+	TaskID   int64
+	Name     string
+}

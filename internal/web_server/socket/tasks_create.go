@@ -114,14 +114,25 @@ func (t *TTaskCreate) createTask() error {
 	if !ok {
 		return fmt.Errorf("TTaskCreate.createTask(): имя не задано")
 	}
-	rows := db.Tasks{
+	row := db.Tasks{
 		Name: name,
 		Tp:   tp_task,
 		Path: ph,
 	}
-	err := db.DB.Table("tasks").Create(&rows).Error
+	err := db.DB.Table("tasks").Create(&row).Error
 	if err != nil {
 		return fmt.Errorf("TaskCreate.Start(): создание записи, err=%w", err)
+	}
+
+	taskName := fmt.Sprintf("task_%v", row.Id)
+	task := db.Task{
+		Name:     taskName,
+		TaskID:   row.Id,
+		PathBase: fmt.Sprintf("tasks/%v", taskName),
+	}
+	err = db.DB.Table("task").Create(&task).Error
+	if err != nil {
+		return fmt.Errorf("TaskCreate.Start(): создание записи task, err=%w", err)
 	}
 
 	return nil

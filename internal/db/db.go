@@ -94,6 +94,7 @@ func (db *TDB) create_tables() error {
 			"id"	INTEGER NOT NULL UNIQUE,
 			"path_base"	TEXT,
 			"name"	TEXT,
+			"task_id"	INTEGER NOT NULL,
 			PRIMARY KEY("id" AUTOINCREMENT)
 		);`,
 	}

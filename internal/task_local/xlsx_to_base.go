@@ -2,26 +2,30 @@ package task_local
 
 import (
 	"bytes"
-	"database/sql"
 	"fmt"
 	"log"
 	"strings"
+	"unicode"
 
 	"github.com/xuri/excelize/v2"
 )
 
-type tInXlsxToBase struct {
+type TInXlsxToBase struct {
 	File bytes.Buffer
-	DB   *sql.DB
 	List string
 }
+type TXlsxTable struct {
+	Headers []string
+	Data    []map[string]interface{}
+}
+type TXlsxTables map[string]TXlsxTable
 
-func (t *TTaskLocal) xlsxToBase(in *tInXlsxToBase) ([]map[string]interface{}, error) {
+func XlsxToBase(in *TInXlsxToBase) (TXlsxTables, error) {
 	var err error
-	table := make([]map[string]interface{}, 0)
+	tables := make(TXlsxTables, 0)
 
 	if in.File.Len() == 0 {
-		return table, nil
+		return tables, nil
 	}
 
 	var rXlsx *excelize.File
@@ -31,41 +35,67 @@ func (t *TTaskLocal) xlsxToBase(in *tInXlsxToBase) ([]map[string]interface{}, er
 		return nil, fmt.Errorf("NewXlsxToBase(): чтение файла xlsx, err=%w", err)
 	}
 
-	rows, err := rXlsx.Rows(in.List)
-	if err != nil {
-		return nil, fmt.Errorf("NewXlsxToBase(): чтение файла xlsx, err=%w", err)
-	}
+	sheets := rXlsx.GetSheetList()
 
-	var header []string
-	var ind int
-	for rows.Next() {
-		row, err := rows.Columns()
+	for _, sheet := range sheets {
+		if !IsEngByLoop(sheet) {
+			continue
+		}
+		table := TXlsxTable{
+			Data: make([]map[string]interface{}, 0),
+		}
+		rows, err := rXlsx.Rows(sheet)
 		if err != nil {
-			log.Println(err)
+			return nil, fmt.Errorf("NewXlsxToBase(): чтение файла xlsx, err=%w", err)
 		}
-		if ind == 0 {
-			header = row
-			for ind, v := range header {
-				header[ind] = strings.ToLower(v)
+
+		var header []string
+		var ind int
+		for rows.Next() {
+			row, err := rows.Columns()
+			if err != nil {
+				log.Println(err)
 			}
+			if ind == 0 {
+				header = row
+				for ind, v := range header {
+					header[ind] = strings.ToLower(v)
+				}
+				ind += 1
+				continue
+			}
+			if ind == 1 {
+				ind += 1
+				continue
+			}
+			line := make(map[string]interface{})
+			for iCel, colCell := range row {
+				if iCel > len(header)-1 {
+					break
+				}
+				key := header[iCel]
+				line[key] = colCell
+			}
+			table.Data = append(table.Data, line)
 			ind += 1
-			continue
 		}
-		if ind == 1 {
-			ind += 1
-			continue
+		if err = rows.Close(); err != nil {
+			return nil, fmt.Errorf("NewXlsxToBase(): закрытие файла xlsx, err=%w", err)
 		}
-		line := make(map[string]interface{})
-		for iCel, colCell := range row {
-			key := header[iCel]
-			line[key] = colCell
-		}
-		table = append(table, line)
-		ind += 1
-	}
-	if err = rows.Close(); err != nil {
-		return nil, fmt.Errorf("NewXlsxToBase(): закрытие файла xlsx, err=%w", err)
+
+		table.Headers = header
+
+		tables[sheet] = table
 	}
 
-	return table, nil
+	return tables, nil
+}
+
+func IsEngByLoop(str string) bool {
+	for i := 0; i < len(str); i++ {
+		if str[i] > unicode.MaxASCII {
+			return false
+		}
+	}
+	return true
 }
