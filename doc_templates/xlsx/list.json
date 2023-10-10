@@ -1,0 +1,6 @@
+{
+    "type": "xlsx_list",
+    "resource": {
+        "1": {"file": "example.xlsx", "func_edit": "Example", "comment": "Демонстрация заполнения таблицы"}
+    }
+}

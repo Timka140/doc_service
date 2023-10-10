@@ -1,0 +1,6 @@
+{
+    "type": "docx_list",
+    "resource": {
+        "1": {"file": "dynamic_table_tpl.docx", "comment": "Демонстрирует возможности формирования документов"}
+    }
+}

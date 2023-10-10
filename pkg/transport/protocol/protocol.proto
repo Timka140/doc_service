@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "projects/doc/doc_service/pkg/transport/protocol/grpc-pb;pb";
+
+option java_multiple_files = true;
+option java_outer_classname = "ProtocolProto";
+
+message ReportFormat {
+   string type = 1; // Тип отчета
+   repeated ReportInfo info = 4; // Описание посылки
+   bytes pack = 5; // Готовые данные в бинарном виде
+
+}
+
+message ReportInfo {
+   int32 size = 1; // Размер файла
+   string error = 2; // Описание ошибки формирования отчета
+}
+  
+message ReportReq { // Формат запроса
+   ReportFormat SrvAdr = 1;
+}
+  
+message ReportResp { // Формат ответа
+   ReportFormat SrvAdr = 1;
+}
+
+
+//Ping
+message ServerPing {
+   string type = 1; // Тип опроса
+   int64 tm = 2; // Время задержки
+}
+
+message PingReq { // Формат запроса
+   ServerPing SrvPing = 1;
+}
+  
+message PingResp { // Формат ответа
+   ServerPing SrvPing = 1;
+}
+
+  
+service Service {
+   rpc GenerateReport (ReportReq) returns (ReportResp); // Генерация отчета
+   rpc Ping (PingReq) returns (PingResp); // Проверка доступности сервиса
+}

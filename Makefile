@@ -1,0 +1,33 @@
+build:
+	clear
+	go fmt ./...
+	go build -o ./bin/doc_service ./cmd/doc_service/main.go
+run:
+	clear
+	go fmt ./...
+	go build -race -o ./bin/doc_service ./cmd/doc_service/main.go
+	./dev.sh
+mod:
+	clear
+	go get ./...
+	go get -u ./...
+	go mod tidy -compat=1.21
+	go mod vendor
+lint:
+	clear
+	go fmt ./...
+	golangci-lint run ./...
+	gocyclo -over 10 ./
+	gocritic check ./...
+	staticcheck ./...
+test.run:
+	clear
+	go fmt ./...
+	go test -vet=all -race -timeout 30s -coverprofile cover.out ./...
+	go tool cover -func=cover.out
+
+SERVICEURL=./
+graph:
+	goda graph -f "{{.Package.Name}}" "shared($(SERVICEURL)... )" | dot -Tsvg -o ./docs/graph.svg
+dot:
+	goda graph -f "{{.Package.Name}}" "shared($(SERVICEURL)... )" > ./docs/graph.dot
