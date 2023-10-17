@@ -15,7 +15,13 @@ import (
 
 type TDocxIn struct {
 	Template []byte                 `json:"template"`
+	Images   []TImage               `json:"images"`
 	Data     map[string]interface{} `json:"data"`
+}
+
+type TImage struct {
+	Name  string `json:"name"`
+	Image []byte `json:"image"`
 }
 
 type TDocxOut struct {
@@ -72,7 +78,7 @@ func (t *TFillDocx) declaration() error {
 		nil,            // arguments
 	)
 	if err != nil {
-		return fmt.Errorf("TDocxInteraction.declaration(): создание очереди, err=%w", err)
+		return fmt.Errorf("TFillDocx.declaration(): создание очереди, err=%w", err)
 	}
 
 	//Out каналы получения данных
@@ -85,7 +91,7 @@ func (t *TFillDocx) declaration() error {
 		nil,   // arguments
 	)
 	if err != nil {
-		return fmt.Errorf("TDocxInteraction.declaration(): создание очереди, err=%w", err)
+		return fmt.Errorf("TFillDocx.declaration(): создание очереди, err=%w", err)
 	}
 
 	return nil
@@ -103,12 +109,12 @@ func (t *TFillDocx) Send(data *bytes.Buffer) error {
 		false,      // mandatory
 		false,      // immediate
 		amqp.Publishing{
-			ContentType:   "text/plain",
-			Body:          data.Bytes(), //bytes,
-			CorrelationId: t.servicePid,
+			ContentType: "text/plain",
+			Body:        data.Bytes(), //bytes,
+			AppId:       t.servicePid,
 		})
 	if err != nil {
-		return fmt.Errorf("TDocxInteraction.FillDocx(): отправка в очередь, err=%w", err)
+		return fmt.Errorf("TFillDocx.Send(): отправка в очередь, err=%w", err)
 	}
 	return nil
 }
@@ -144,11 +150,6 @@ func (t *TFillDocx) Result(fn func(data *TDocxOut)) error {
 		}
 	}()
 	t.wg.Wait()
-
-	// err = t.ch.Cancel("", true)
-	// if err != nil {
-	// 	return fmt.Errorf("TFillDocx.Result(): прерывание канала, err=%w", err)
-	// }
 
 	err = t.ch.Close()
 	if err != nil {

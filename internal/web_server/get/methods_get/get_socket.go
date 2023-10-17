@@ -48,6 +48,12 @@ func (t *TSocket) GetContext(c *gin.Context) {
 		return
 	}
 
+	defer func() {
+		if r := recover(); r != nil {
+			log.Printf("NewGet(): ошибка сокета, err=%v", r)
+		}
+	}()
+
 	conn := ses.GetConn()
 	// ses, err := sessions
 

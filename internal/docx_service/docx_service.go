@@ -12,6 +12,7 @@ import (
 )
 
 var DocxServices IDocxService
+var FlowDocx interaction.IFlowDocx
 
 type IDocxService interface {
 	interaction.IDocxInteraction
@@ -95,4 +96,11 @@ func init() {
 		log.Printf("docx_service.init(): инициализация сервисов, err:%v", err)
 		os.Exit(1)
 	}
+
+	FlowDocx, err = DocxServices.FlowDocx()
+	if err != nil {
+		log.Printf("docx_service.init(): инициализация FlowDocx, err=%v", err)
+		os.Exit(1)
+	}
+
 }

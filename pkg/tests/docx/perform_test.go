@@ -13,7 +13,7 @@ import (
 func TestTDocx_Perform(t *testing.T) {
 	var wg sync.WaitGroup
 
-	for index := 0; index < 10; index++ {
+	for index := 0; index < 8; index++ {
 		testWork(&wg, fmt.Sprintf("work_%v", index))
 	}
 	wg.Wait()
@@ -27,7 +27,7 @@ func testWork(wg *sync.WaitGroup, name string) {
 			log.Println("создание транспорта", err)
 		}
 
-		for index := 0; index < 100_000; index++ {
+		for index := 0; index < 10_000; index++ {
 
 			res, err := tr.DocxPerform("1", methods.TParams{NameFile: fmt.Sprintf("test_%v_%v", name, index), ConvertPDF: false, Rotation: false},
 				map[string]interface{}{
@@ -46,6 +46,8 @@ func testWork(wg *sync.WaitGroup, name string) {
 			if res == nil {
 				return
 			}
+
+			fmt.Println(res.Name)
 
 			// f, err := os.Create(filepath.Join("res", res.Name+"."+res.Ext))
 			// if err != nil {

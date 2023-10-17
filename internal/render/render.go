@@ -46,11 +46,6 @@ func NewRender() (IRender, error) {
 		return nil, fmt.Errorf("render.NewRender(): ошибка инициализации render_docx: err =%w", err)
 	}
 
-	t.docx, err = render_docx.NewRenderDocx()
-	if err != nil {
-		return nil, fmt.Errorf("render.NewRender(): ошибка инициализации render_docx: err =%w", err)
-	}
-
 	t.xlsx, err = render_xlsx.NewRenderXlsx()
 	if err != nil {
 		return nil, fmt.Errorf("render.NewRender(): ошибка инициализации render_xlsx: err =%w", err)

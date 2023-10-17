@@ -37,7 +37,7 @@ func (t *TDocxInteraction) InfoWorkers() error {
 		amqp.Publishing{
 			ContentType: "text/plain",
 			Body:        []byte{}, //bytes,
-			// CorrelationId: uuid.NewString(),
+			// AppId: uuid.NewString(),
 		})
 	if err != nil {
 		return fmt.Errorf("TDocxInteraction.InfoServers(): публикация в очередь, err=%w", err)

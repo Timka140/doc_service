@@ -12,6 +12,7 @@ import (
 type IDocxInteraction interface {
 	Workers() (workers.IWorkers, error) //Предоставляет доступ к микросервисам
 	FillDocx() (IFillDocx, error)       //Предоставляет функционал заполнения шаблонов с помощью микросервисов
+	FlowDocx() (IFlowDocx, error)       //Предоставляет функционал заполнения шаблонов с помощью микросервисов
 	InfoWorkers() error
 }
 type TDocxInteraction struct {

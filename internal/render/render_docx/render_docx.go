@@ -17,6 +17,7 @@ type TRenderDocx struct {
 
 func NewRenderDocx() (IRenderDocx, error) {
 	var err error
+
 	t := &TRenderDocx{}
 
 	t.IFillDocx, err = fill_docx.NewFillDocx()

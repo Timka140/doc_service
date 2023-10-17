@@ -96,7 +96,7 @@ func (t *TLoginPost) GetContext(c *gin.Context) {
 		// MaxAge:   3600,
 		// HttpOnly: true,
 		// Secure:   true,
-		// SameSite: http.SameSiteLaxMode,
+		SameSite: http.SameSiteLaxMode,
 	})
 
 	c.Redirect(http.StatusTemporaryRedirect, "/gui/")

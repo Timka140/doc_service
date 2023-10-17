@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 
+	"projects/doc/doc_service/internal/docx_service"
+	"projects/doc/doc_service/internal/docx_service/interaction"
 	"projects/doc/doc_service/pkg/transport/methods"
 )
 
@@ -18,6 +20,7 @@ type IFillDocx interface {
 type TFillDocx struct {
 	fileDocx *bytes.Buffer
 	params   methods.TParams
+	flow     interaction.IFlowDocx
 
 	templates_path string
 }
@@ -31,6 +34,7 @@ func NewFillDocx() (IFillDocx, error) {
 	t := &TFillDocx{
 		templates_path: templates,
 		fileDocx:       bytes.NewBuffer(nil),
+		flow:           docx_service.FlowDocx,
 	}
 
 	return t, nil

@@ -58,7 +58,7 @@ func (t *TCmd) send(data *[]byte) error {
 		amqp.Publishing{
 			ContentType: "text/plain",
 			Body:        *data, //bytes,
-			// CorrelationId: uuid.NewString(),
+			// AppId: uuid.NewString(),
 		})
 	if err != nil {
 		return fmt.Errorf("TCmd.send(): публикация в очередь, err=%w", err)
