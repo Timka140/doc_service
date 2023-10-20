@@ -1,4 +1,4 @@
-package formats_xlsx
+package xlsx
 
 import (
 	"encoding/json"

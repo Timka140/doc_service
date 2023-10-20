@@ -1,4 +1,4 @@
-package formats_docx
+package docx
 
 import (
 	"encoding/json"

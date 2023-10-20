@@ -1,4 +1,4 @@
-package formats_docx
+package docx
 
 import "projects/doc/doc_service/pkg/transport/methods"
 

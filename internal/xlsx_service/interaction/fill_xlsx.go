@@ -14,24 +14,24 @@ import (
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
-type TDocxIn struct {
+type TXlsxIn struct {
 	Template []byte                 `json:"template"`
 	Images   []methods.TImage       `json:"images"`
 	Data     map[string]interface{} `json:"data"`
 }
 
-type TDocxOut struct {
+type TXlsxOut struct {
 	Err  string `json:"err"`
 	Data []byte `json:"data"`
 }
 
-type IFillDocx interface {
-	Pack(in *TDocxIn) (*bytes.Buffer, error) //упаковка данных для отправки
+type IFillXlsx interface {
+	Pack(in *TXlsxIn) (*bytes.Buffer, error) //упаковка данных для отправки
 	Send(data *bytes.Buffer) error           // отправка данных в микросервис
-	Result(fn func(data *TDocxOut)) error    // принимает результат микросервиса
+	Result(fn func(data *TXlsxOut)) error    // принимает результат микросервиса
 }
 
-type TFillDocx struct {
+type TFillXlsx struct {
 	servicePid string
 	ch         *amqp.Channel
 	wg         sync.WaitGroup
@@ -40,15 +40,15 @@ type TFillDocx struct {
 	fOut amqp.Queue //Канал чтения
 }
 
-func (t *TDocxInteraction) FillDocx() (IFillDocx, error) {
+func (t *TXlsxInteraction) FillXlsx() (IFillXlsx, error) {
 
 	ch, err := t.conn.Channel() //Спорный момент возможно лучше сделать 1 канал а не открывать постоянно новый
 	if err != nil {
-		return nil, fmt.Errorf("TDocxInteraction.FillDocx() открытие канала, err=%w", err)
+		return nil, fmt.Errorf("TXlsxInteraction.FillXlsx() открытие канала, err=%w", err)
 	}
 
 	// var err error
-	fillDocx := &TFillDocx{
+	fillDocx := &TFillXlsx{
 		ch: ch,
 		// ch:         t.ch,
 		servicePid: uuid.NewString(),
@@ -56,17 +56,17 @@ func (t *TDocxInteraction) FillDocx() (IFillDocx, error) {
 
 	err = fillDocx.declaration()
 	if err != nil {
-		return nil, fmt.Errorf("TDocxInteraction.FillDocx() декларация очередей, err=%w", err)
+		return nil, fmt.Errorf("TXlsxInteraction.FillXlsx() декларация очередей, err=%w", err)
 	}
 
 	return fillDocx, nil
 }
 
-func (t *TFillDocx) declaration() error {
+func (t *TFillXlsx) declaration() error {
 	var err error
 	//In каналы отправки данных
 	t.fIn, err = t.ch.QueueDeclare(
-		"fill_docx_in", // name
+		"fill_xlsx_in", // name
 		false,          // durable
 		false,          // delete when unused
 		false,          // exclusive
@@ -74,12 +74,12 @@ func (t *TFillDocx) declaration() error {
 		nil,            // arguments
 	)
 	if err != nil {
-		return fmt.Errorf("TFillDocx.declaration(): создание очереди, err=%w", err)
+		return fmt.Errorf("TFillXlsx.declaration(): создание очереди, err=%w", err)
 	}
 
 	//Out каналы получения данных
 	t.fOut, err = t.ch.QueueDeclare(
-		fmt.Sprintf("fill_docx_%v_out", t.servicePid), // name
+		fmt.Sprintf("fill_xlsx_%v_out", t.servicePid), // name
 		false, // durable
 		false, // delete when unused
 		false, // exclusive
@@ -87,14 +87,14 @@ func (t *TFillDocx) declaration() error {
 		nil,   // arguments
 	)
 	if err != nil {
-		return fmt.Errorf("TFillDocx.declaration(): создание очереди, err=%w", err)
+		return fmt.Errorf("TFillXlsx.declaration(): создание очереди, err=%w", err)
 	}
 
 	return nil
 }
 
 // Send() - возвращает заполненный документ
-func (t *TFillDocx) Send(data *bytes.Buffer) error {
+func (t *TFillXlsx) Send(data *bytes.Buffer) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -110,13 +110,13 @@ func (t *TFillDocx) Send(data *bytes.Buffer) error {
 			AppId:       t.servicePid,
 		})
 	if err != nil {
-		return fmt.Errorf("TFillDocx.Send(): отправка в очередь, err=%w", err)
+		return fmt.Errorf("TFillXlsx.Send(): отправка в очередь, err=%w", err)
 	}
 	return nil
 }
 
 // Result() - возвращает заполненный документ
-func (t *TFillDocx) Result(fn func(data *TDocxOut)) error {
+func (t *TFillXlsx) Result(fn func(data *TXlsxOut)) error {
 
 	msgs, err := t.ch.Consume(
 		t.fOut.Name, // queue
@@ -128,15 +128,15 @@ func (t *TFillDocx) Result(fn func(data *TDocxOut)) error {
 		nil,         // args
 	)
 	if err != nil {
-		return fmt.Errorf("TFillDocx.Result(): прослушивание очереди, err=%w", err)
+		return fmt.Errorf("TFillXlsx.Result(): прослушивание очереди, err=%w", err)
 	}
 
 	go func() {
 		for d := range msgs {
-			var data TDocxOut
+			var data TXlsxOut
 			err := json.Unmarshal(d.Body, &data)
 			if err != nil {
-				log.Printf("TFillDocx.Result(): чтение пакета, err=%v", err)
+				log.Printf("TFillXlsx.Result(): чтение пакета, err=%v", err)
 				t.wg.Done()
 				continue
 			}
@@ -149,21 +149,21 @@ func (t *TFillDocx) Result(fn func(data *TDocxOut)) error {
 
 	err = t.ch.Close()
 	if err != nil {
-		return fmt.Errorf("TFillDocx.Result(): закрытие канала, err=%w", err)
+		return fmt.Errorf("TFillXlsx.Result(): закрытие канала, err=%w", err)
 	}
 
 	return nil
 }
 
 // Pack() - Упаковывает данные для отправки
-func (t *TFillDocx) Pack(in *TDocxIn) (*bytes.Buffer, error) {
+func (t *TFillXlsx) Pack(in *TXlsxIn) (*bytes.Buffer, error) {
 	if in == nil {
-		return nil, fmt.Errorf("TFillDocx.Pack(): объект пуст")
+		return nil, fmt.Errorf("TFillXlsx.Pack(): объект пуст")
 	}
 
 	data, err := json.Marshal(in)
 	if err != nil {
-		return nil, fmt.Errorf("TFillDocx.Pack(): упаковка данных, err=%w", err)
+		return nil, fmt.Errorf("TFillXlsx.Pack(): упаковка данных, err=%w", err)
 	}
 
 	return bytes.NewBuffer(data), nil

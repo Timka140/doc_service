@@ -96,14 +96,6 @@ func (t *TRunDocxServices) closeServices() error {
 		works.Delete(pid)
 	}
 
-	// works.Range(func(pid string, work workers.IWorker) {
-	// 	err := work.Exit()
-	// 	if err != nil {
-	// 		log.Printf("TRunDocxServices.closeAllServices(): получение микросервисов, err=%v", err)
-	// 	}
-
-	// 	works.Delete(pid)
-	// })
 	err = docx_service.DocxServices.InfoWorkers()
 	if err != nil {
 		return fmt.Errorf("TRunDocxServices.closeAllServices(): запрос количества сервисов, %w", err)

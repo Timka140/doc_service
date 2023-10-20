@@ -97,6 +97,23 @@ func (db *TDB) create_tables() error {
 			"task_id"	INTEGER NOT NULL,
 			PRIMARY KEY("id" AUTOINCREMENT)
 		);`,
+		"templates": `CREATE TABLE "templates" (
+			"id"	INTEGER NOT NULL UNIQUE,
+			"path"	TEXT,
+			"name"	TEXT,
+			"tp"	INTEGER,
+			"comment"	TEXT,
+			"data"	BLOB,
+			"hash"	TEXT,
+			PRIMARY KEY("id" AUTOINCREMENT)
+		);`,
+		"template": `CREATE TABLE "template" (
+			"id"	INTEGER NOT NULL UNIQUE,
+			"path_base"	TEXT,
+			"template_id"	INTEGER,
+			"name"	TEXT,
+			PRIMARY KEY("id" AUTOINCREMENT)
+		);`,
 	}
 
 	for key, val := range tables_create {

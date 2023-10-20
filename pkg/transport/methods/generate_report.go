@@ -34,6 +34,13 @@ type TGenerateReports struct {
 type TGenerateReportReqPack struct {
 	Code   string                 `json:"code"`   // Тип шаблона
 	Params map[string]interface{} `json:"params"` // Параметры шаблона
+	Images []TImage               `json:"images"`
+}
+
+// Список изображений для замены
+type TImage struct {
+	Name  string `json:"name"`
+	Image []byte `json:"image"`
 }
 
 // Результирующая структура ответа запакованная в Pack

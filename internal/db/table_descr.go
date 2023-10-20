@@ -27,3 +27,20 @@ type Task struct {
 	TaskID   int64
 	Name     string
 }
+
+type Templates struct {
+	Id      int64
+	Path    string
+	Name    string
+	Tp      int
+	Comment string
+	Data    []byte
+	Hash    string
+}
+
+type Template struct {
+	Id       int64
+	PathBase string
+	TaskID   int64
+	Name     string
+}

@@ -13,34 +13,35 @@ func (t *TFillDocx) RenderDocx(report *methods.TReport) (err error) {
 	var pack methods.TGenerateReportReqPack
 	err = json.Unmarshal(report.Pack, &pack)
 	if err != nil {
-		return fmt.Errorf("fill_docx.NewFillDocx(): неизвестный формат данных, err=%w", err)
+		return fmt.Errorf("TFillDocx.RenderDocx(): неизвестный формат данных, err=%w", err)
 	}
 	//Устанавливаю параметры
 	t.params = report.Params
 
 	if pack.Code == "" {
-		return fmt.Errorf("fill_docx.NewFillDocx(): код шаблона не задан")
+		return fmt.Errorf("TFillDocx.RenderDocx(): код шаблона не задан")
 	}
 
 	if pack.Params == nil {
-		return fmt.Errorf("fill_docx.NewFillDocx(): данные для шаблона не заданы")
+		return fmt.Errorf("TFillDocx.RenderDocx(): данные для шаблона не заданы")
 	}
 
 	file, err := t.select_template(pack.Code)
 	if err != nil {
-		return fmt.Errorf("fill_docx.NewFillDocx(): не удалось получить шаблон, err=%w", err)
+		return fmt.Errorf("TFillDocx.RenderDocx(): не удалось получить шаблон, err=%w", err)
 	}
 
 	fDocx, err := t.flow.Send(&interaction.TDocxIn{
 		Template: file,
 		Data:     pack.Params,
+		Images:   pack.Images,
 	})
 	if err != nil {
-		return fmt.Errorf("fill_docx.NewFillDocx(): отправка шаблона, err=%w", err)
+		return fmt.Errorf("TFillDocx.RenderDocx(): отправка шаблона, err=%w", err)
 	}
 
-	if fDocx.Err != nil {
-		return fmt.Errorf("fill_docx.NewFillDocx(): формирование, err=%v", fDocx.Err)
+	if fDocx.Err != "" {
+		return fmt.Errorf("TFillDocx.RenderDocx(): формирование, err=%v", fDocx.Err)
 	}
 
 	if fDocx.Data != nil {

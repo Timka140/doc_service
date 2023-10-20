@@ -1,4 +1,4 @@
-package formats_xlsx
+package xlsx
 
 import "projects/doc/doc_service/pkg/transport/methods"
 

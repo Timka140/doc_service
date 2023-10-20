@@ -4,12 +4,13 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"projects/doc/doc_service/internal/convert_pdf"
 	"projects/doc/doc_service/internal/render/doc_one"
 	"projects/doc/doc_service/internal/render/render_csv"
 	"projects/doc/doc_service/internal/render/render_docx"
+	"projects/doc/doc_service/internal/render/render_pdf"
 	"projects/doc/doc_service/internal/render/render_xlsx"
 
+	"projects/doc/doc_service/pkg/cons"
 	"projects/doc/doc_service/pkg/transport/methods"
 	pb "projects/doc/doc_service/pkg/transport/protocol"
 )
@@ -28,7 +29,8 @@ type TRender struct {
 	csv    render_csv.IRenderCsv   // Формирование документа csv
 	docOne doc_one.IDocOne         //Формирование документов через doc_one
 
-	convert_pdf convert_pdf.IConvertPDF //Конвертация и обработка PDF
+	pdf render_pdf.IRenderPdf //Конвертация и обработка PDF
+	// convert_pdf convert_pdf.IConvertPDF //Конвертация и обработка PDF
 }
 
 // Инициализация движков формирования отчета
@@ -56,9 +58,14 @@ func NewRender() (IRender, error) {
 		return nil, fmt.Errorf("render.NewRender(): ошибка инициализации render_csv: err =%w", err)
 	}
 
-	t.convert_pdf, err = convert_pdf.NewConvertPDF()
+	// t.convert_pdf, err = convert_pdf.NewConvertPDF()
+	// if err != nil {
+	// 	return nil, fmt.Errorf("render.NewRender(): ошибка инициализации convert_pdf: err =%w", err)
+	// }
+
+	t.pdf, err = render_pdf.NewRenderPdf()
 	if err != nil {
-		return nil, fmt.Errorf("render.NewRender(): ошибка инициализации convert_pdf: err =%w", err)
+		return nil, fmt.Errorf("render.NewRender(): ошибка инициализации render_pdf: err =%w", err)
 	}
 
 	return t, nil
@@ -102,14 +109,14 @@ func (t *TRender) SelectRender(SrvAdr *pb.ReportFormat) (result []byte, err erro
 
 	for _, report := range reports.ReportFiles {
 		switch report.Format {
-		case "doc_one":
+		case cons.CExtDocOne:
 			// err = t.docOne.RenderDocOne(report)
 			// if err != nil {
 			// 	return nil, fmt.Errorf("TRender.SelectRender(): выполнение doc_one, err=%w", err)
 			// }
 
 			// report.File = t.docOne.GetDocument()
-		case "docx":
+		case cons.CExtDocx:
 			err = t.docx.RenderDocx(report)
 			if err != nil {
 				return nil, fmt.Errorf("TRender.SelectRender(): выполнение docx, err=%w", err)
@@ -117,28 +124,35 @@ func (t *TRender) SelectRender(SrvAdr *pb.ReportFormat) (result []byte, err erro
 
 			report.File = t.docx.GetDocument()
 
-		case "xlsx":
+		case cons.CExtXlsx:
 			err = t.xlsx.RenderXlsx(report)
 			if err != nil {
 				return nil, fmt.Errorf("TRender.SelectRender(): выполнение xlsx, err=%w", err)
 			}
 
 			report.File = t.xlsx.GetDocument()
-		case "csv":
+		case cons.CExtCsv:
+		case cons.CExtPdf:
+			err = t.pdf.RenderPdf(report)
+			if err != nil {
+				return nil, fmt.Errorf("TRender.SelectRender(): выполнение pdf, err=%w", err)
+			}
+
+			report.File = t.pdf.GetDocument()
 		default:
 			return nil, fmt.Errorf("TRender.SelectRender(): неизвестный формат отчета")
 		}
 	}
 
-	err = t.convert_pdf.SetData(reports)
-	if err != nil {
-		return nil, fmt.Errorf("TRender.SelectRender(): установка данных, err=%w", err)
-	}
+	// err = t.convert_pdf.SetData(reports)
+	// if err != nil {
+	// 	return nil, fmt.Errorf("TRender.SelectRender(): установка данных, err=%w", err)
+	// }
 
-	err = t.convert_pdf.ConvertPDF()
-	if err != nil {
-		return nil, fmt.Errorf("TRender.SelectRender(): конвертация, err=%w", err)
-	}
+	// err = t.convert_pdf.ConvertPDF()
+	// if err != nil {
+	// 	return nil, fmt.Errorf("TRender.SelectRender(): конвертация, err=%w", err)
+	// }
 
 	pack, err := t.packReports(reports)
 	if err != nil {

@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 
+	"projects/doc/doc_service/internal/xlsx_service"
+	"projects/doc/doc_service/internal/xlsx_service/interaction"
 	"projects/doc/doc_service/pkg/transport/methods"
 
 	"github.com/xuri/excelize/v2"
@@ -23,6 +25,8 @@ type TFillXlsx struct {
 	fileXlsx *bytes.Buffer
 	params   methods.TParams
 
+	flow interaction.IFlowXlsx
+
 	templates_path string
 }
 
@@ -35,6 +39,7 @@ func NewFillXlsx() (IFillXlsx, error) {
 	t := &TFillXlsx{
 		templates_path: templates,
 		fileXlsx:       bytes.NewBuffer(nil),
+		flow:           xlsx_service.FlowXlsx,
 	}
 
 	return t, nil
