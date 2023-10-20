@@ -46,7 +46,12 @@ func (t *TTemplatesCreate) Start() error {
 		t.data["tp_temp"] = 3
 		err = t.createTemplate()
 		if err != nil {
-			return fmt.Errorf("TaskCreate.Start(): создание задачи, err=%w", err)
+			return fmt.Errorf("TaskCreate.Start(): создание шаблона, err=%w", err)
+		}
+	case "remove":
+		err = t.remove()
+		if err != nil {
+			return fmt.Errorf("TaskCreate.Start(): удаление, err=%w", err)
 		}
 	}
 
@@ -96,6 +101,67 @@ func (t *TTemplatesCreate) createCatalog() error {
 	return nil
 }
 
+func (t *TTemplatesCreate) remove() error {
+	temps, ok := t.data["temps"].([]interface{})
+	if !ok {
+		return fmt.Errorf("TTemplatesCreate.remove(): отсутствуют данные")
+	}
+
+	for _, item := range temps {
+		v, ok := item.(map[string]interface{})
+		if !ok {
+			continue
+		}
+		sl, ok := v["select"].(bool)
+		if !ok {
+			continue
+		}
+
+		if !sl {
+			continue
+		}
+
+		tp, ok := v["Tp"].(float64)
+		if !ok {
+			continue
+		}
+
+		id, ok := v["Id"].(float64)
+		if !ok {
+			continue
+		}
+
+		if tp == 3 {
+			err := db.DB.Exec("DELETE FROM templates WHERE id = ?", id).Error
+			if err != nil {
+				return fmt.Errorf("TaskCreate.Start(): удаление, err=%w", err)
+			}
+			continue
+		}
+
+		path, ok := v["Path"].(string)
+		if !ok {
+			continue
+		}
+		name, ok := v["Name"].(string)
+		if !ok {
+			continue
+		}
+
+		if path == "/" {
+			path = ""
+		}
+
+		path = fmt.Sprintf("%v/%v", path, name) + "%"
+		err := db.DB.Exec("DELETE FROM templates WHERE path LIKE ? OR id = ?", path, id).Error
+		if err != nil {
+			return fmt.Errorf("TaskCreate.Start(): удаление, err=%w", err)
+		}
+	}
+
+	return nil
+}
+
 func (t *TTemplatesCreate) createTemplate() error {
 	ph, ok := t.data["path"].(string)
 	if !ok {
@@ -124,16 +190,16 @@ func (t *TTemplatesCreate) createTemplate() error {
 		return fmt.Errorf("TaskCreate.Start(): создание записи, err=%w", err)
 	}
 
-	taskName := fmt.Sprintf("template_%v", row.Id)
-	task := db.Template{
-		Name:     taskName,
-		TaskID:   row.Id,
-		PathBase: fmt.Sprintf("templates/%v", taskName),
-	}
-	err = db.DB.Table("template").Create(&task).Error
-	if err != nil {
-		return fmt.Errorf("TaskCreate.Start(): создание записи task, err=%w", err)
-	}
+	// taskName := fmt.Sprintf("template_%v", row.Id)
+	// task := db.Template{
+	// 	Name:     taskName,
+	// 	TaskID:   row.Id,
+	// 	PathBase: fmt.Sprintf("templates/%v", taskName),
+	// }
+	// err = db.DB.Table("template").Create(&task).Error
+	// if err != nil {
+	// 	return fmt.Errorf("TaskCreate.Start(): создание записи task, err=%w", err)
+	// }
 
 	return nil
 }
