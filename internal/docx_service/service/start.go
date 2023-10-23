@@ -25,9 +25,9 @@ func (t *TService) startService() error {
 
 	switch runtime.GOOS {
 	case "windows":
-		t.cmd = exec.Command("./docx_service.exe", t.pid, t.host, t.port)
+		t.cmd = exec.Command("./docx_service.exe", t.pid, fmt.Sprintf("%v:%v", t.host, t.port), t.auth)
 	case "linux":
-		t.cmd = exec.Command("./docx_service", t.pid, t.host, t.port)
+		t.cmd = exec.Command("./docx_service", t.pid, fmt.Sprintf("%v:%v", t.host, t.port), t.auth)
 	}
 
 	var stdout bytes.Buffer

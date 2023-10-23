@@ -15,12 +15,17 @@ func (t *TPdfInteraction) Connect() error {
 		return fmt.Errorf("TXlsxInteraction.Connect() RabbitHost неуказан")
 	}
 
+	rabbitAuth := os.Getenv("RabbitAuth")
+	if rabbitHost == "" {
+		return fmt.Errorf("TXlsxInteraction.Connect() RabbitAuth неуказан")
+	}
+
 	rabbitPort := os.Getenv("RabbitPort")
 	if rabbitPort == "" {
 		return fmt.Errorf("TXlsxInteraction.Connect() RabbitPort неуказан")
 	}
 
-	t.conn, err = amqp.Dial(fmt.Sprintf("amqp://guest:guest@%v:%v/", rabbitHost, rabbitPort))
+	t.conn, err = amqp.Dial(fmt.Sprintf("amqp://%v@%v:%v/", rabbitAuth, rabbitHost, rabbitPort))
 	if err != nil {
 		return fmt.Errorf("TXlsxInteraction.Connect() установка соединения, err=%w", err)
 	}

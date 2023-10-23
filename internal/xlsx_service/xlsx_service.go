@@ -23,6 +23,7 @@ type TDocxService struct {
 	interaction.IXlsxInteraction
 	services   sync.Map
 	rabbitHost string
+	rabbitAuth string
 	rabbitPort string
 }
 
@@ -32,6 +33,11 @@ func NewXlsxService() (IXlsxService, error) {
 		return nil, fmt.Errorf("NewXlsxService() RabbitHost неуказан")
 	}
 
+	rabbitAuth := os.Getenv("RabbitAuth")
+	if rabbitHost == "" {
+		return nil, fmt.Errorf("NewXlsxService() RabbitAuth неуказан")
+	}
+
 	rabbitPort := os.Getenv("RabbitPort")
 	if rabbitPort == "" {
 		return nil, fmt.Errorf("NewXlsxService() RabbitPort неуказан")
@@ -39,6 +45,7 @@ func NewXlsxService() (IXlsxService, error) {
 
 	t := &TDocxService{
 		rabbitHost: rabbitHost,
+		rabbitAuth: rabbitAuth,
 		rabbitPort: rabbitPort,
 	}
 

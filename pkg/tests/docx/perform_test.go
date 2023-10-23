@@ -3,20 +3,27 @@ package docx_test
 import (
 	"fmt"
 	"log"
+	"os"
+	"path/filepath"
 	"sync"
 	"testing"
+	"time"
 
 	"projects/doc/doc_service/pkg/transport"
+	"projects/doc/doc_service/pkg/transport/formats/pdf"
 	"projects/doc/doc_service/pkg/transport/methods"
 )
 
 func TestTDocx_Perform(t *testing.T) {
 	var wg sync.WaitGroup
 
-	for index := 0; index < 8; index++ {
+	start := time.Now()
+	for index := 0; index < 4; index++ {
 		testWork(&wg, fmt.Sprintf("work_%v", index))
 	}
 	wg.Wait()
+	duration := time.Since(start)
+	fmt.Println(duration)
 }
 
 func testWork(wg *sync.WaitGroup, name string) {
@@ -27,9 +34,9 @@ func testWork(wg *sync.WaitGroup, name string) {
 			log.Println("создание транспорта", err)
 		}
 
-		for index := 0; index < 10_000; index++ {
+		for index := 0; index < 10; index++ {
 
-			res, err := tr.DocxPerform("1", methods.TParams{NameFile: fmt.Sprintf("test_%v_%v", name, index), ConvertPDF: false, Rotation: false},
+			res_docx, err := tr.DocxPerform("1", methods.TParams{NameFile: fmt.Sprintf("test_%v_%v", name, index), ConvertPDF: false, Rotation: false},
 				map[string]interface{}{
 					"col_labels": []string{"fruit", "vegetable", "stone", "thing"},
 					"tbl_contents": []interface{}{
@@ -43,20 +50,47 @@ func testWork(wg *sync.WaitGroup, name string) {
 				log.Println("Отправка данных", err)
 			}
 
-			if res == nil {
+			if res_docx == nil {
 				return
 			}
 
-			fmt.Println(res.Name)
+			res_pdf, err := tr.PdfPerform(pdf.TFiles{
+				Files: []*pdf.TFile{
+					{
+						FileData: res_docx.FileData,
+						Ext:      "docx",
+						Name:     "test_1",
+					},
+					{
+						FileData: res_docx.FileData,
+						Ext:      "docx",
+						Name:     "test_2",
+						Params: pdf.TParams{
+							// Join:     true,
+							Rotation: true,
+						},
+					},
+				},
+			})
 
-			// f, err := os.Create(filepath.Join("res", res.Name+"."+res.Ext))
-			// if err != nil {
-			// 	log.Println("создание файла", err)
-			// }
+			if err != nil {
+				log.Println("Отправка данных", err)
+			}
 
-			// f.Write(res.FileData)
+			if res_pdf == nil {
+				return
+			}
 
-			// f.Close()
+			fmt.Println(res_docx.Name)
+
+			f, err := os.Create(filepath.Join("res", res_docx.Name+"."+res_pdf.Ext))
+			if err != nil {
+				log.Println("создание файла", err)
+			}
+
+			f.Write(res_pdf.FileData)
+
+			f.Close()
 
 		}
 		wg.Done()

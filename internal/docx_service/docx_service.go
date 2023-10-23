@@ -23,6 +23,7 @@ type TDocxService struct {
 	interaction.IDocxInteraction
 	services   sync.Map
 	rabbitHost string
+	rabbitAuth string
 	rabbitPort string
 }
 
@@ -32,6 +33,11 @@ func NewDocxService() (IDocxService, error) {
 		return nil, fmt.Errorf("NewDocxService() RabbitHost неуказан")
 	}
 
+	rabbitAuth := os.Getenv("RabbitAuth")
+	if rabbitHost == "" {
+		return nil, fmt.Errorf("NewDocxService() RabbitAuth неуказан")
+	}
+
 	rabbitPort := os.Getenv("RabbitPort")
 	if rabbitPort == "" {
 		return nil, fmt.Errorf("NewDocxService() RabbitPort неуказан")
@@ -39,6 +45,7 @@ func NewDocxService() (IDocxService, error) {
 
 	t := &TDocxService{
 		rabbitHost: rabbitHost,
+		rabbitAuth: rabbitAuth,
 		rabbitPort: rabbitPort,
 	}
 
@@ -57,6 +64,7 @@ func (t *TDocxService) StartService() error {
 	s, err := service.NewService(&service.TInStart{
 		RabbitHost: t.rabbitHost,
 		RabbitPort: t.rabbitPort,
+		RabbitAuth: t.rabbitAuth,
 		Pid:        pid,
 	})
 	if err != nil {

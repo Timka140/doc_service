@@ -3,7 +3,6 @@ package service
 import (
 	"bytes"
 	"fmt"
-	"os"
 	"os/exec"
 	"runtime"
 )
@@ -15,19 +14,23 @@ func (t *TService) startService() error {
 	// 	log.Println(err)
 	// }
 	// fmt.Println(path)
-	if _, err := os.Stat("./docx_service"); os.IsNotExist(err) {
-		return fmt.Errorf("start_service(): отсутствует микросервис для linux")
-	}
+	// if _, err := os.Stat("./docx_service"); os.IsNotExist(err) {
+	// 	return fmt.Errorf("start_service(): отсутствует микросервис для linux")
+	// }
 
-	if _, err := os.Stat("./docx_service.exe"); os.IsNotExist(err) {
-		return fmt.Errorf("start_service(): отсутствует микросервис для windows")
-	}
+	// if _, err := os.Stat("./pdf_service.exe"); os.IsNotExist(err) {
+	// 	return fmt.Errorf("start_service(): отсутствует микросервис для windows")
+	// }
 
+	// docker run -e RabbitURL=192.168.0.43:5672 -e RabbitAuth=doc_service:doc_123 -e PdfOut=./pdf  --network=host pdf_service
+
+	// fmt.Sprintf("RabbitURL=%v:%v", t.host, t.port), "./pdf"
 	switch runtime.GOOS {
 	case "windows":
-		t.cmd = exec.Command("./docx_service.exe", t.pid, t.host, t.port)
+		t.cmd = exec.Command("docker", "run", "-e", fmt.Sprintf("RabbitURL=%v:%v", t.host, t.port), "-e", fmt.Sprintf("RabbitAuth=%v", t.auth), "-e", "PdfOut=./pdf", "--network=host", "pdf_service")
 	case "linux":
-		t.cmd = exec.Command("./docx_service", t.pid, t.host, t.port)
+		t.cmd = exec.Command("docker", "run", "-e", fmt.Sprintf("RabbitURL=%v:%v", t.host, t.port), "-e", fmt.Sprintf("RabbitAuth=%v", t.auth), "-e", "PdfOut=./pdf", "--network=host", "pdf_service")
+		// t.cmd = exec.Command("./docx_service", t.pid, t.host, t.port)
 	}
 
 	var stdout bytes.Buffer

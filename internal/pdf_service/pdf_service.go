@@ -23,6 +23,7 @@ type TPdfService struct {
 	interaction.IPdfInteraction
 	services   sync.Map
 	rabbitHost string
+	rabbitAuth string
 	rabbitPort string
 }
 
@@ -32,6 +33,11 @@ func NewPdfService() (IPdfService, error) {
 		return nil, fmt.Errorf("NewPdfService() RabbitHost неуказан")
 	}
 
+	rabbitAuth := os.Getenv("RabbitAuth")
+	if rabbitHost == "" {
+		return nil, fmt.Errorf("NewPdfService() RabbitAuth неуказан")
+	}
+
 	rabbitPort := os.Getenv("RabbitPort")
 	if rabbitPort == "" {
 		return nil, fmt.Errorf("NewPdfService() RabbitPort неуказан")
@@ -39,6 +45,7 @@ func NewPdfService() (IPdfService, error) {
 
 	t := &TPdfService{
 		rabbitHost: rabbitHost,
+		rabbitAuth: rabbitAuth,
 		rabbitPort: rabbitPort,
 	}
 
@@ -57,6 +64,7 @@ func (t *TPdfService) StartService() error {
 	s, err := service.NewService(&service.TInStart{
 		RabbitHost: t.rabbitHost,
 		RabbitPort: t.rabbitPort,
+		RabbitAuth: t.rabbitAuth,
 		Pid:        pid,
 	})
 	if err != nil {

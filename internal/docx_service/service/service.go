@@ -25,11 +25,13 @@ type TService struct {
 
 	host string
 	port string
+	auth string
 	pid  string
 }
 type TInStart struct {
 	RabbitHost string
 	RabbitPort string
+	RabbitAuth string
 	Pid        string
 }
 
@@ -37,6 +39,7 @@ func NewService(in *TInStart) (IService, error) {
 	t := &TService{
 		host:   in.RabbitHost,
 		port:   in.RabbitPort,
+		auth:   in.RabbitAuth,
 		pid:    in.Pid,
 		cClose: make(chan TClose, 1),
 	}
