@@ -1,4 +1,4 @@
-package fill_pdf
+package docx
 
 import (
 	"encoding/json"
@@ -10,10 +10,10 @@ import (
 )
 
 // Возвращает структуру запакованного документа документа
-func (t *TFillPdf) GetDocument() (file methods.TFile) {
+func (t *tFillDocx) GetDocument() (file methods.TFile) {
 	file = methods.TFile{
-		FileData: t.filePdf.Bytes(),
-		Ext:      cons.CExtPdf,
+		FileData: t.fileDocx.Bytes(),
+		Ext:      cons.CExtDocx,
 		Name:     t.params.NameFile,
 	}
 
@@ -21,13 +21,13 @@ func (t *TFillPdf) GetDocument() (file methods.TFile) {
 }
 
 // Возвращает файл docx в байтовом виде
-func (t *TFillPdf) ReadBytes() (data []byte, err error) {
+func (t *tFillDocx) ReadBytes() (data []byte, err error) {
 
 	pack := methods.TGenerateReportRespPack{
 		Files: []*methods.TFile{
 			{
-				FileData: t.filePdf.Bytes(),
-				Ext:      cons.CExtPdf,
+				FileData: t.fileDocx.Bytes(),
+				Ext:      cons.CExtDocx,
 				Name:     t.params.NameFile,
 			},
 		},
@@ -42,13 +42,13 @@ func (t *TFillPdf) ReadBytes() (data []byte, err error) {
 }
 
 // Записывает файл docx по нужному пути
-func (t *TFillPdf) WriteToPath(path string) (err error) {
+func (t *tFillDocx) WriteToPath(path string) (err error) {
 	f, err := os.Create(path)
 	if err != nil {
 		return fmt.Errorf("TFillDocx.WriteToPath(): создание файла docx, err=%w", err)
 	}
 
-	f.Write(t.filePdf.Bytes())
+	f.Write(t.fileDocx.Bytes())
 
 	err = f.Close()
 	if err != nil {

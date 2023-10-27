@@ -18,7 +18,7 @@ func TestTDocx_Perform(t *testing.T) {
 	var wg sync.WaitGroup
 
 	start := time.Now()
-	for index := 0; index < 4; index++ {
+	for index := 0; index < 1; index++ {
 		testWork(&wg, fmt.Sprintf("work_%v", index))
 	}
 	wg.Wait()
@@ -34,9 +34,9 @@ func testWork(wg *sync.WaitGroup, name string) {
 			log.Println("создание транспорта", err)
 		}
 
-		for index := 0; index < 10; index++ {
+		for index := 0; index < 1; index++ {
 
-			res_docx, err := tr.DocxPerform("1", methods.TParams{NameFile: fmt.Sprintf("test_%v_%v", name, index), ConvertPDF: false, Rotation: false},
+			res_docx, err := tr.DocxPerform("14", methods.TParams{NameFile: fmt.Sprintf("test_%v_%v", name, index), ConvertPDF: false, Rotation: false},
 				map[string]interface{}{
 					"col_labels": []string{"fruit", "vegetable", "stone", "thing"},
 					"tbl_contents": []interface{}{

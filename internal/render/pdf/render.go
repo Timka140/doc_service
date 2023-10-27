@@ -1,4 +1,4 @@
-package fill_pdf
+package pdf
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 )
 
 // Создает файл по шаблону pdf
-func (t *TFillPdf) RenderPdf(report *methods.TReport) (err error) {
+func (t *tFillPdf) Render(report *methods.TReport) (err error) {
 	fPdf, err := t.flow.Send(report.Pack)
 	if err != nil {
 		return fmt.Errorf("TFillPdf.RenderPdf(): отправка шаблона, err=%w", err)

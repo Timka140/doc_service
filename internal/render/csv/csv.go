@@ -1,14 +1,14 @@
-package render_csv
+package csv
 
 // Заготовка под формирования Csv файлов
 type IRenderCsv interface {
 }
 
-type TRenderCsv struct {
+type tRenderCsv struct {
 }
 
 func NewRenderCsv() (IRenderCsv, error) {
-	t := &TRenderCsv{}
+	t := &tRenderCsv{}
 
 	return t, nil
 }

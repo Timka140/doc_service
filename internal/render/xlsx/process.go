@@ -1,4 +1,4 @@
-package fill_docx
+package xlsx
 
 import (
 	"encoding/json"
@@ -10,10 +10,10 @@ import (
 )
 
 // Возвращает структуру запакованного документа документа
-func (t *TFillDocx) GetDocument() (file methods.TFile) {
+func (t *tFillXlsx) GetDocument() (file methods.TFile) {
 	file = methods.TFile{
-		FileData: t.fileDocx.Bytes(),
-		Ext:      cons.CExtDocx,
+		FileData: t.fileXlsx.Bytes(),
+		Ext:      cons.CExtXlsx,
 		Name:     t.params.NameFile,
 	}
 
@@ -21,13 +21,13 @@ func (t *TFillDocx) GetDocument() (file methods.TFile) {
 }
 
 // Возвращает файл docx в байтовом виде
-func (t *TFillDocx) ReadBytes() (data []byte, err error) {
+func (t *tFillXlsx) ReadBytes() (data []byte, err error) {
 
 	pack := methods.TGenerateReportRespPack{
 		Files: []*methods.TFile{
 			{
-				FileData: t.fileDocx.Bytes(),
-				Ext:      cons.CExtDocx,
+				FileData: t.fileXlsx.Bytes(),
+				Ext:      cons.CExtXlsx,
 				Name:     t.params.NameFile,
 			},
 		},
@@ -35,24 +35,24 @@ func (t *TFillDocx) ReadBytes() (data []byte, err error) {
 
 	data, err = json.Marshal(pack)
 	if err != nil {
-		return nil, fmt.Errorf("fill_docx.ReadBytes(): закрытие файла docx, err=%w", err)
+		return nil, fmt.Errorf("TFillXlsx.ReadBytes(): закрытие файла docx, err=%w", err)
 	}
 
 	return data, nil
 }
 
 // Записывает файл docx по нужному пути
-func (t *TFillDocx) WriteToPath(path string) (err error) {
+func (t *tFillXlsx) WriteToPath(path string) (err error) {
 	f, err := os.Create(path)
 	if err != nil {
-		return fmt.Errorf("TFillDocx.WriteToPath(): создание файла docx, err=%w", err)
+		return fmt.Errorf("TFillXlsx.WriteToPath(): создание файла docx, err=%w", err)
 	}
 
-	f.Write(t.fileDocx.Bytes())
+	f.Write(t.fileXlsx.Bytes())
 
 	err = f.Close()
 	if err != nil {
-		return fmt.Errorf("TFillDocx.WriteToPath(): запись файла docx, err=%w", err)
+		return fmt.Errorf("TFillXlsx.WriteToPath(): запись файла docx, err=%w", err)
 	}
 	return nil
 }

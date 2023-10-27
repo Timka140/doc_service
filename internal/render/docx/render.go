@@ -1,15 +1,16 @@
-package fill_docx
+package docx
 
 import (
 	"encoding/json"
 	"fmt"
 
 	"projects/doc/doc_service/internal/docx_service/interaction"
+	"projects/doc/doc_service/internal/template"
 	"projects/doc/doc_service/pkg/transport/methods"
 )
 
 // Создает файл по шаблону docx
-func (t *TFillDocx) RenderDocx(report *methods.TReport) (err error) {
+func (t *tFillDocx) Render(report *methods.TReport) (err error) {
 	var pack methods.TGenerateReportReqPack
 	err = json.Unmarshal(report.Pack, &pack)
 	if err != nil {
@@ -26,13 +27,22 @@ func (t *TFillDocx) RenderDocx(report *methods.TReport) (err error) {
 		return fmt.Errorf("TFillDocx.RenderDocx(): данные для шаблона не заданы")
 	}
 
-	file, err := t.select_template(pack.Code)
+	tmp, err := template.New(pack.Code)
+	if err != nil {
+		return fmt.Errorf("TFillDocx.RenderDocx(): инициализация шаблона, err=%w", err)
+	}
+
+	if !tmp.IsFile() {
+		return fmt.Errorf("TFillDocx.RenderDocx(): шаблон не загружен")
+	}
+
+	file, err := tmp.BaseLoad()
 	if err != nil {
 		return fmt.Errorf("TFillDocx.RenderDocx(): не удалось получить шаблон, err=%w", err)
 	}
 
 	fDocx, err := t.flow.Send(&interaction.TDocxIn{
-		Template: file,
+		Template: file.Data,
 		Data:     pack.Params,
 		Images:   pack.Images,
 	})
