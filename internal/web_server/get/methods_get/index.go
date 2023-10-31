@@ -3,7 +3,6 @@ package methods_get
 import (
 	"log"
 	"net/http"
-	"projects/doc/doc_service/internal/web_server/sessions"
 	"projects/doc/doc_service/internal/web_server/templates"
 	"text/template"
 
@@ -24,14 +23,14 @@ func newIndexPage(in *TInGetPage) IGetPage {
 }
 
 func (t *TIndexPage) GetPath() string {
-	return "/gui/"
+	return "/gui/*action"
 }
 
 func (t *TIndexPage) GetContext(c *gin.Context) {
-	ses := sessions.Ses.GetSes(c)
-	if ses == nil {
-		return
-	}
+	// ses := sessions.Ses.GetSes(c)
+	// if ses == nil {
+	// 	return
+	// }
 
 	var err error
 	t.tmp, err = templates.NewTemplates()

@@ -20,10 +20,10 @@ func NewStatic(router *gin.Engine) (err error) {
 	}
 
 	router.StaticFile("/favicon.ico", filepath.Join(static, "favicon.ico"))
-	router.StaticFS("/static", http.Dir(filepath.Join(static)))
+	// router.StaticFS("dist", http.Dir(filepath.Join(static)))
 
-	// router.StaticFS("/css", http.Dir(filepath.Join(static, "css")))
-	// router.StaticFS("/js", http.Dir(filepath.Join(static, "js")))
+	router.StaticFS("/css", http.Dir(filepath.Join(static, "css")))
+	router.StaticFS("/js", http.Dir(filepath.Join(static, "js")))
 
 	return nil
 }

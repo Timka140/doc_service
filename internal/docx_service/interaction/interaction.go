@@ -4,20 +4,21 @@ import (
 	"fmt"
 	"log"
 	"projects/doc/doc_service/internal/docx_service/interaction/workers"
+	"projects/doc/doc_service/pkg/types"
 
 	"github.com/google/uuid"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
 type IDocxInteraction interface {
-	Workers() (workers.IWorkers, error) //Предоставляет доступ к микросервисам
-	FillDocx() (IFillDocx, error)       //Предоставляет функционал заполнения шаблонов с помощью микросервисов
-	FlowDocx() (IFlowDocx, error)       //Предоставляет функционал заполнения шаблонов с помощью микросервисов
+	Workers() (types.IWorkers, error) //Предоставляет доступ к микросервисам
+	FillDocx() (IFillDocx, error)     //Предоставляет функционал заполнения шаблонов с помощью микросервисов
+	FlowDocx() (IFlowDocx, error)     //Предоставляет функционал заполнения шаблонов с помощью микросервисов
 	InfoWorkers() error
 }
 type TDocxInteraction struct {
 	sPid string
-	workers.IWorkers
+	types.IWorkers
 
 	conn *amqp.Connection
 	ch   *amqp.Channel
@@ -52,7 +53,7 @@ func NewDocxInteraction() (IDocxInteraction, error) {
 	return t, nil
 }
 
-func (t *TDocxInteraction) Workers() (workers.IWorkers, error) {
+func (t *TDocxInteraction) Workers() (types.IWorkers, error) {
 	if t.IWorkers == nil {
 		return nil, fmt.Errorf("Workers(): IWorkers не инициализирован")
 	}

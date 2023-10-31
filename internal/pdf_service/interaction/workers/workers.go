@@ -2,6 +2,7 @@ package workers
 
 import (
 	"fmt"
+	"projects/doc/doc_service/pkg/types"
 	"sync"
 
 	amqp "github.com/rabbitmq/amqp091-go"
@@ -9,13 +10,6 @@ import (
 
 var workers sync.Map //список подключенных приложений
 
-type IWorkers interface {
-	Add(pid string) error           //Добавляет микросервис
-	List() TListWorkers             //Возвращает список микросервисов
-	Get(pid string) (IWorker, bool) //Получить микросервис
-	Range(fn func(pid string, work IWorker))
-	Delete(pid string)
-}
 type TWorkers struct {
 	ch *amqp.Channel
 }
@@ -24,7 +18,7 @@ type TWorkersIn struct {
 	Ch *amqp.Channel
 }
 
-func NewWorkers(in *TWorkersIn) (IWorkers, error) {
+func NewWorkers(in *TWorkersIn) (types.IWorkers, error) {
 	t := &TWorkers{
 		ch: in.Ch,
 	}
@@ -43,14 +37,8 @@ func (t *TWorkers) Add(pid string) error {
 	return nil
 }
 
-type TListWorker struct {
-	Pid    string
-	Online bool
-}
-type TListWorkers map[string]*TListWorker
-
-func (t *TWorkers) List() TListWorkers {
-	list := make(TListWorkers)
+func (t *TWorkers) List() types.TListWorkers {
+	list := make(types.TListWorkers)
 
 	workers.Range(func(key, value any) bool {
 		pid, ok := key.(string)
@@ -58,12 +46,12 @@ func (t *TWorkers) List() TListWorkers {
 			return true
 		}
 
-		work, ok := value.(IWorker)
+		work, ok := value.(types.IWorker)
 		if !ok {
 			return true
 		}
 
-		list[pid] = &TListWorker{
+		list[pid] = &types.TListWorker{
 			Pid:    pid,
 			Online: work.Online(),
 		}
@@ -72,13 +60,22 @@ func (t *TWorkers) List() TListWorkers {
 	return list
 }
 
-func (t *TWorkers) Get(pid string) (IWorker, bool) {
+func (t *TWorkers) Len() int {
+	var len int
+	workers.Range(func(key, value any) bool {
+		len++
+		return true
+	})
+	return len
+}
+
+func (t *TWorkers) Get(pid string) (types.IWorker, bool) {
 	v, ok := workers.Load(pid)
 	if !ok {
 		return nil, false
 	}
 
-	work, ok := v.(IWorker)
+	work, ok := v.(types.IWorker)
 	if !ok {
 		return nil, false
 	}
@@ -90,7 +87,7 @@ func (t *TWorkers) Delete(pid string) {
 	workers.Delete(pid)
 }
 
-func (t *TWorkers) Range(fn func(pid string, work IWorker)) {
+func (t *TWorkers) Range(fn func(pid string, work types.IWorker)) {
 
 	workers.Range(func(key, value any) bool {
 		pid, ok := key.(string)
@@ -98,7 +95,7 @@ func (t *TWorkers) Range(fn func(pid string, work IWorker)) {
 			return true
 		}
 
-		work, ok := value.(IWorker)
+		work, ok := value.(types.IWorker)
 		if !ok {
 			return true
 		}

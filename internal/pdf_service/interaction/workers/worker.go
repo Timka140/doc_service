@@ -2,15 +2,13 @@ package workers
 
 import (
 	"fmt"
+	"projects/doc/doc_service/pkg/types"
 
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
-type IWorker interface {
-	ICmd
-}
 type TWorker struct {
-	ICmd
+	types.ICmd
 	pid string
 	ch  *amqp.Channel
 }
@@ -18,7 +16,7 @@ type TWorkerIn struct {
 	Pid string
 }
 
-func (t *TWorkers) newWorker(in *TWorkerIn) (IWorker, error) {
+func (t *TWorkers) newWorker(in *TWorkerIn) (types.IWorker, error) {
 	work := &TWorker{
 		pid: in.Pid,
 		ch:  t.ch,

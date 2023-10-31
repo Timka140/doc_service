@@ -12,7 +12,7 @@ import (
 code - принимает ключ шаблона для генерации документа
 params - принимает параметры для шаблона
 */
-func (t *TDocx) DocxPerform(code string, params methods.TParams, data map[string]interface{}) (res *methods.TFile, err error) {
+func (t *TDocx) DocxPerform(code string, data map[string]interface{}) (res *methods.TFile, err error) {
 
 	pack, err := json.Marshal(methods.TGenerateReportReqPack{
 		Code:   code,
@@ -30,7 +30,6 @@ func (t *TDocx) DocxPerform(code string, params methods.TParams, data map[string
 					Format: cons.CExtDocx,
 					Code:   code,
 					Pack:   pack,
-					Params: params,
 				},
 			},
 		})

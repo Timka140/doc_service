@@ -91,17 +91,17 @@ func (t *TSession) SendMessage(params map[string]interface{}) (err error) {
 	}
 
 	if t.conn.Conn == nil {
-		return
+		return nil
 	}
 
 	t.conn.Lock()
+	defer t.conn.Unlock()
 	err = t.conn.WriteMessage(websocket.TextMessage, send)
 	if err != nil {
-		return
+		return err
 	}
-	t.conn.Unlock()
 
-	return err
+	return nil
 }
 
 func (t *TSession) GetCurrentPage() string {

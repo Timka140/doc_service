@@ -4,20 +4,21 @@ import (
 	"fmt"
 	"log"
 	"projects/doc/doc_service/internal/pdf_service/interaction/workers"
+	"projects/doc/doc_service/pkg/types"
 
 	"github.com/google/uuid"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
 type IPdfInteraction interface {
-	Workers() (workers.IWorkers, error) //Предоставляет доступ к микросервисам
-	FillPdf() (IFillPdf, error)         //Предоставляет функционал заполнения шаблонов с помощью микросервисов
-	FlowPdf() (IFlowPdf, error)         //Предоставляет функционал заполнения шаблонов с помощью микросервисов
+	Workers() (types.IWorkers, error) //Предоставляет доступ к микросервисам
+	FillPdf() (IFillPdf, error)       //Предоставляет функционал заполнения шаблонов с помощью микросервисов
+	FlowPdf() (IFlowPdf, error)       //Предоставляет функционал заполнения шаблонов с помощью микросервисов
 	InfoWorkers() error
 }
 type TPdfInteraction struct {
 	sPid string
-	workers.IWorkers
+	types.IWorkers
 
 	conn *amqp.Connection
 	ch   *amqp.Channel
@@ -52,7 +53,7 @@ func NewPdfInteraction() (IPdfInteraction, error) {
 	return t, nil
 }
 
-func (t *TPdfInteraction) Workers() (workers.IWorkers, error) {
+func (t *TPdfInteraction) Workers() (types.IWorkers, error) {
 	if t.IWorkers == nil {
 		return nil, fmt.Errorf("TPdfInteraction.Workers(): IWorkers не инициализирован")
 	}

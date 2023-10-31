@@ -3,22 +3,19 @@ package docx_test
 import (
 	"fmt"
 	"log"
-	"os"
-	"path/filepath"
 	"sync"
 	"testing"
 	"time"
 
 	"projects/doc/doc_service/pkg/transport"
 	"projects/doc/doc_service/pkg/transport/formats/pdf"
-	"projects/doc/doc_service/pkg/transport/methods"
 )
 
 func TestTDocx_Perform(t *testing.T) {
 	var wg sync.WaitGroup
 
 	start := time.Now()
-	for index := 0; index < 1; index++ {
+	for index := 0; index < 4; index++ {
 		testWork(&wg, fmt.Sprintf("work_%v", index))
 	}
 	wg.Wait()
@@ -34,9 +31,9 @@ func testWork(wg *sync.WaitGroup, name string) {
 			log.Println("создание транспорта", err)
 		}
 
-		for index := 0; index < 1; index++ {
+		for index := 0; index < 100000; index++ {
 
-			res_docx, err := tr.DocxPerform("14", methods.TParams{NameFile: fmt.Sprintf("test_%v_%v", name, index), ConvertPDF: false, Rotation: false},
+			res_docx, err := tr.DocxPerform("14",
 				map[string]interface{}{
 					"col_labels": []string{"fruit", "vegetable", "stone", "thing"},
 					"tbl_contents": []interface{}{
@@ -81,16 +78,16 @@ func testWork(wg *sync.WaitGroup, name string) {
 				return
 			}
 
-			fmt.Println(res_docx.Name)
+			// fmt.Println(res_docx.Name)
 
-			f, err := os.Create(filepath.Join("res", res_docx.Name+"."+res_pdf.Ext))
-			if err != nil {
-				log.Println("создание файла", err)
-			}
+			// f, err := os.Create(filepath.Join("res", res_docx.Name+"."+res_pdf.Ext))
+			// if err != nil {
+			// 	log.Println("создание файла", err)
+			// }
 
-			f.Write(res_pdf.FileData)
+			// f.Write(res_pdf.FileData)
 
-			f.Close()
+			// f.Close()
 
 		}
 		wg.Done()

@@ -4,16 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"projects/doc/doc_service/pkg/types"
 	"time"
 
 	"github.com/rabbitmq/amqp091-go"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
-
-type ICmd interface {
-	Exit() error // завершает работу внешнего микросервиса
-	Online() bool
-}
 
 type TCmd struct {
 	online bool
@@ -23,7 +19,7 @@ type TCmd struct {
 }
 
 // initCmd() - инициализация канала
-func (t *TWorker) initCmd() (ICmd, error) {
+func (t *TWorker) initCmd() (types.ICmd, error) {
 	cmd := &TCmd{
 		ch: t.ch,
 	}

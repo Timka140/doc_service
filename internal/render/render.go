@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"projects/doc/doc_service/internal/monitor"
 	"projects/doc/doc_service/internal/render/csv"
 	"projects/doc/doc_service/internal/render/docx"
 	"projects/doc/doc_service/internal/render/pdf"
@@ -97,7 +98,12 @@ func (t *TRender) SelectRender(SrvAdr *pb.ReportFormat) (result []byte, err erro
 		return nil, fmt.Errorf("TRender.SelectRender(): инициация, err=%w", err)
 	}
 
+	m := monitor.Monitor()
+
 	for _, report := range reports.ReportFiles {
+		if m != nil {
+			m.Add(report.Format)
+		}
 		switch report.Format {
 		case cons.CExtDocOne:
 		case cons.CExtDocx:

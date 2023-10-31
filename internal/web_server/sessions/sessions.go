@@ -56,16 +56,28 @@ func (t *TSessions) Get(key string) (ISession, error) {
 	return ses, nil
 }
 
-func (t *TSessions) GetSes(c *gin.Context) ISession {
-	val, err := c.Cookie("AccessToken")
-	if err != nil {
-		c.Redirect(http.StatusTemporaryRedirect, "/gui/login")
-		// redirect.Redirect(c, "/gui/login")
-		return nil
-		// return nil, fmt.Errorf(" GetSes(): чтение cookie, err=%w", err)
+func (t *TSessions) getToken(c *gin.Context) string {
+	token := c.Request.Header.Get("AccessToken")
+	if token != "" {
+		return token
 	}
 
-	ses, err := t.Get(val)
+	var err error
+	token, err = c.Cookie("AccessToken")
+	if err != nil {
+		return ""
+	}
+	return token
+}
+func (t *TSessions) GetSes(c *gin.Context) ISession {
+	var err error
+	token := t.getToken(c)
+	if token == "" {
+		c.Redirect(http.StatusTemporaryRedirect, "/gui/login")
+		return nil
+	}
+
+	ses, err := t.Get(token)
 	if err != nil {
 		c.Redirect(http.StatusTemporaryRedirect, "/gui/login")
 		// redirect.Redirect(c, "/gui/login")

@@ -4,20 +4,21 @@ import (
 	"fmt"
 	"log"
 	"projects/doc/doc_service/internal/xlsx_service/interaction/workers"
+	"projects/doc/doc_service/pkg/types"
 
 	"github.com/google/uuid"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
 type IXlsxInteraction interface {
-	Workers() (workers.IWorkers, error) //Предоставляет доступ к микросервисам
-	FillXlsx() (IFillXlsx, error)       //Предоставляет функционал заполнения шаблонов с помощью микросервисов
-	FlowXlsx() (IFlowXlsx, error)       //Предоставляет функционал заполнения шаблонов с помощью микросервисов
+	Workers() (types.IWorkers, error) //Предоставляет доступ к микросервисам
+	FillXlsx() (IFillXlsx, error)     //Предоставляет функционал заполнения шаблонов с помощью микросервисов
+	FlowXlsx() (IFlowXlsx, error)     //Предоставляет функционал заполнения шаблонов с помощью микросервисов
 	InfoWorkers() error
 }
 type TXlsxInteraction struct {
 	sPid string
-	workers.IWorkers
+	types.IWorkers
 
 	conn *amqp.Connection
 	ch   *amqp.Channel
@@ -52,7 +53,7 @@ func NewXlsxInteraction() (IXlsxInteraction, error) {
 	return t, nil
 }
 
-func (t *TXlsxInteraction) Workers() (workers.IWorkers, error) {
+func (t *TXlsxInteraction) Workers() (types.IWorkers, error) {
 	if t.IWorkers == nil {
 		return nil, fmt.Errorf("TXlsxInteraction.Workers(): IWorkers не инициализирован")
 	}
