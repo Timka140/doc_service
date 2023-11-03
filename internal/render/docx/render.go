@@ -36,13 +36,13 @@ func (t *tFillDocx) Render(report *methods.TReport) (err error) {
 		return fmt.Errorf("TFillDocx.RenderDocx(): шаблон не загружен")
 	}
 
-	file, err := tmp.BaseLoad()
+	tData, err := tmp.Template()
 	if err != nil {
-		return fmt.Errorf("TFillDocx.RenderDocx(): не удалось получить шаблон, err=%w", err)
+		return fmt.Errorf("TFillDocx.RenderDocx(): чтение шаблона, err=%w", err)
 	}
 
 	fDocx, err := t.flow.Send(&interaction.TDocxIn{
-		Template: file.Data,
+		Template: tData,
 		Data:     pack.Params,
 		Images:   pack.Images,
 	})

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 
 	"projects/doc/doc_service/internal/db"
 	"projects/doc/doc_service/internal/grpc_server"
@@ -39,6 +40,11 @@ func main() {
 	err := db.NewDB()
 	if err != nil {
 		log.Fatalf("main(): инициализация базы данных, err=%v", err)
+	}
+
+	err = os.MkdirAll(filepath.Join("./store"), 0755)
+	if err != nil {
+		log.Fatalf("main(): создание папки, err=%v", err)
 	}
 
 	go func() {

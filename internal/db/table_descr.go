@@ -38,9 +38,10 @@ type Templates struct {
 	Hash    string
 }
 
-type Template struct {
-	Id       int64
-	PathBase string
-	TaskID   int64
-	Name     string
+type TemplateVersions struct {
+	Id         int64
+	Data       []byte
+	TemplateID int64
+	User       string
+	DateUpdate string
 }

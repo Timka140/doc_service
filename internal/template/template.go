@@ -2,6 +2,7 @@ package template
 
 import (
 	"fmt"
+	"os"
 	"projects/doc/doc_service/internal/db"
 	"projects/doc/doc_service/pkg/types"
 	"strconv"
@@ -82,7 +83,19 @@ func (t *tTemplate) BaseLoad() (*types.TFile, error) {
 }
 
 func (t *tTemplate) IsFile() bool {
-	return t.file.Data != nil
+	if _, err := os.Stat(t.file.PathTemplate); err == nil {
+		return true
+	}
+	return false
+}
+
+// Template -- возвращает шаблон
+func (t *tTemplate) Template() ([]byte, error) {
+	data, err := os.ReadFile(t.file.PathTemplate)
+	if err != nil {
+		return nil, fmt.Errorf("tTemplate.BaseLoad(): чтение шаблона, err=%w", err)
+	}
+	return data, nil
 }
 
 func (t *tTemplate) Name() string {

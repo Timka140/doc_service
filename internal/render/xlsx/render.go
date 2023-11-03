@@ -36,13 +36,13 @@ func (t *tFillXlsx) Render(report *methods.TReport) (err error) {
 		return fmt.Errorf("TFillXlsx.RenderXlsx(): шаблон не загружен")
 	}
 
-	file, err := tmp.BaseLoad()
+	tData, err := tmp.Template()
 	if err != nil {
-		return fmt.Errorf("TFillXlsx.RenderXlsx(): не удалось получить шаблон, err=%w", err)
+		return fmt.Errorf("TFillDocx.RenderDocx(): чтение шаблона, err=%w", err)
 	}
 
 	fXlsx, err := t.flow.Send(&interaction.TXlsxIn{
-		Template: file.Data,
+		Template: tData,
 		Data:     pack.Params,
 		Images:   pack.Images,
 	})

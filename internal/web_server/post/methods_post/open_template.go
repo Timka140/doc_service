@@ -69,8 +69,15 @@ func (t *TOpenTemplate) GetContext(c *gin.Context) {
 		})
 	}
 
+	tData, err := tmp.Template()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, map[string]interface{}{
+			"err": "TOpenTemplate.GetContext(): чтение шаблона",
+		})
+	}
+
 	c.JSON(http.StatusOK, map[string]interface{}{
-		"file": file.Data,
+		"file": tData,
 		"ext":  file.Ext,
 		"name": file.Name,
 	})

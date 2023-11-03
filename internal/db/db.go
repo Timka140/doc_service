@@ -107,11 +107,12 @@ func (db *TDB) create_tables() error {
 			"hash"	TEXT,
 			PRIMARY KEY("id" AUTOINCREMENT)
 		);`,
-		"template": `CREATE TABLE "template" (
+		"template_versions": `CREATE TABLE "template_versions" (
 			"id"	INTEGER NOT NULL UNIQUE,
-			"path_base"	TEXT,
-			"template_id"	INTEGER,
-			"name"	TEXT,
+			"data"	BLOB,
+			"template_id"	INTEGER NOT NULL,
+			"user"	TEXT,
+			"date_update"	TEXT,
 			PRIMARY KEY("id" AUTOINCREMENT)
 		);`,
 	}
