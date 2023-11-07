@@ -38,10 +38,11 @@ func (t *TTemplate) Start() error {
 		return fmt.Errorf("TTemplate.Start(): не прочитано исполнение")
 	}
 
-	t.template_id, ok = t.data["template_id"].(string)
+	tId, ok := t.data["template_id"]
 	if !ok {
 		return fmt.Errorf("TTemplate.Start(): template_id не задан")
 	}
+	t.template_id = fmt.Sprintf("%v", tId)
 
 	switch execution {
 	case "init":

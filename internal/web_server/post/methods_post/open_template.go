@@ -77,9 +77,10 @@ func (t *TOpenTemplate) GetContext(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, map[string]interface{}{
-		"file": tData,
-		"ext":  file.Ext,
-		"name": file.Name,
+		"template_id": template_id,
+		"file":        tData,
+		"ext":         file.Ext,
+		"name":        file.Name,
 	})
 }
 
