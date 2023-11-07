@@ -9,6 +9,7 @@ __debug_bin
 __debug_*
 .DS_Store
 vendor
+main.exe
 
 
 #Vue
