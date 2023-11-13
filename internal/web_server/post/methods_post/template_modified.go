@@ -107,6 +107,13 @@ func (t *TTemplateModified) GetContext(c *gin.Context) {
 		log.Println("TTemplateModified.GetContext(): не удалось загрузить файл, err=%w", err)
 	}
 
+	err = ses.SendMessage(map[string]interface{}{
+		"tp": "UpdateTemplate",
+	})
+	if err != nil {
+		log.Println("TTemplateModified.GetContext(): обновление шаблона, err=%w", err)
+	}
+
 	c.Status(http.StatusOK)
 }
 

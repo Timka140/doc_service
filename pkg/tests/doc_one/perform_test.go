@@ -3,10 +3,11 @@ package docx_test
 import (
 	"log"
 	"os"
+	"path/filepath"
 	"testing"
 
 	"projects/doc/doc_service/pkg/transport"
-	"projects/doc/doc_service/pkg/transport/methods"
+	"projects/doc/doc_service/pkg/transport/formats/pdf"
 )
 
 func TestTDocx_Perform(t *testing.T) {
@@ -15,22 +16,48 @@ func TestTDocx_Perform(t *testing.T) {
 		log.Println("создание транспорта", err)
 	}
 
-	res, err := tr.DocOnePerform("b72cedea-61b6-11ed-9e58-02c16399bff6", methods.TParams{Rotation: false, NameFile: "doc_one_test"}, map[string]interface{}{
-		"Формальное название потребителя": []string{"Тестовые данные"},
-		"номер договора":                  []string{"24352345324523454"},
-		"Адрес филиала":                   []string{"24352345324523454"},
-		"filial_name":                     []string{"filial тестовые данные"},
+	res_docx, err := tr.DocxPerform("14",
+		map[string]interface{}{
+			"partner_full_name": "Заполнил новое поле",
+			"test1":             "заполнил 2",
+			"tbl_contents": []interface{}{
+				map[string]interface{}{"label": "yellow", "cols": []string{"banana", "capsicum", "pyrite", "taxi"}},
+				map[string]interface{}{"label": "red", "cols": []string{"apple", "tomato", "cinnabar", "doubledecker"}},
+				map[string]interface{}{"label": "green", "cols": []string{"guava", "cucumber", "aventurine", "card"}},
+			},
+		})
+
+	if err != nil {
+		log.Println("создание файла", err)
+	}
+
+	res, err := tr.PdfPerform(pdf.TFiles{
+		Files: []*pdf.TFile{
+			{
+				FileData: res_docx.FileData,
+				Ext:      "docx",
+				Name:     "test_1",
+				Params: pdf.TParams{
+					Rotation: true,
+				},
+			},
+			// {
+			// 	FileData: doc2,
+			// 	Ext:      "docx",
+			// 	Name:     "test_2",
+			// 	Params: pdf.TParams{
+			// 		// Join:     true,
+			// 		Rotation: true,
+			// 	},
+			// },
+		},
 	})
 
 	if err != nil {
-		log.Println("Отправка данных", err)
+		log.Println("создание файла", err)
 	}
 
-	if res == nil {
-		return
-	}
-
-	f, err := os.Create(res.Name + "." + res.Ext)
+	f, err := os.Create(filepath.Join("res", "test."+res.Ext))
 	if err != nil {
 		log.Println("создание файла", err)
 	}
@@ -39,5 +66,4 @@ func TestTDocx_Perform(t *testing.T) {
 
 	f.Close()
 
-	log.Println(res.Ext)
 }

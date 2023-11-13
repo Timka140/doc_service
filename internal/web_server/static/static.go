@@ -24,6 +24,7 @@ func NewStatic(router *gin.Engine) (err error) {
 
 	router.StaticFS("/css", http.Dir(filepath.Join(static, "css")))
 	router.StaticFS("/js", http.Dir(filepath.Join(static, "js")))
+	router.StaticFS("/assets", http.Dir(filepath.Join(static, "assets")))
 
 	return nil
 }
