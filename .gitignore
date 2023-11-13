@@ -10,6 +10,7 @@ __debug_*
 .DS_Store
 vendor
 main.exe
+DocService.exe
 
 
 #Vue
