@@ -1,7 +1,6 @@
 package monitor
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"projects/doc/doc_service/internal/web_server/sessions"
@@ -64,13 +63,10 @@ func (t *tMonitor) run() {
 					if ses.GetCurrentPage() != "/gui/" {
 						return
 					}
-					err := ses.SendMessage(map[string]interface{}{
+					ses.SendMessage(map[string]interface{}{
 						"tp":     "ChartTick",
 						"charts": t.store.data,
 					})
-					if err != nil {
-						fmt.Println(err)
-					}
 				})
 
 				t.store.Lock()

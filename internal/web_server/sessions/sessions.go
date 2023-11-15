@@ -15,6 +15,7 @@ type ISessions interface {
 	Add(key string, ses ISession) error
 	Get(key string) (ISession, error)
 	RangeSes(fn func(ses ISession))
+	Delete(key string)
 }
 type TSessions struct {
 	sessions sync.Map
@@ -54,6 +55,10 @@ func (t *TSessions) Get(key string) (ISession, error) {
 	}
 
 	return ses, nil
+}
+
+func (t *TSessions) Delete(key string) {
+	t.sessions.Delete(key)
 }
 
 func (t *TSessions) getToken(c *gin.Context) string {

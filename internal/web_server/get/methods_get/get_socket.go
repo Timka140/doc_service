@@ -55,6 +55,7 @@ func (t *TSocket) GetContext(c *gin.Context) {
 	}()
 
 	conn := ses.GetConn()
+	ses.OpenSocket()
 	// ses, err := sessions
 
 	UpGrader.CheckOrigin = func(req *http.Request) bool {
@@ -85,6 +86,7 @@ func (t *TSocket) GetContext(c *gin.Context) {
 			}
 
 			if close {
+				ses.CloseSocket()
 				break
 			}
 		}

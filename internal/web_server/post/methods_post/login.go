@@ -13,7 +13,6 @@ import (
 	"projects/doc/doc_service/internal/web_server/sessions"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 )
 
 type TLoginPost struct {
@@ -63,8 +62,6 @@ func (t *TLoginPost) GetContext(c *gin.Context) {
 	key := md5.Sum([]byte(fmt.Sprintf("%v:docGenerator:%v", login, password)))
 	hash := hex.EncodeToString(key[:])
 
-	key_ses := uuid.NewString()
-
 	// hash := ""
 	ses, err := sessions.NewSession(hash)
 	if err != nil {
@@ -83,7 +80,7 @@ func (t *TLoginPost) GetContext(c *gin.Context) {
 		return
 	}
 
-	err = sessions.Ses.Add(key_ses, ses)
+	err = sessions.Ses.Add(ses.Token(), ses)
 	if err != nil {
 		log.Printf("GetContext(): запись сессии, err=%v", err)
 		return
@@ -91,7 +88,7 @@ func (t *TLoginPost) GetContext(c *gin.Context) {
 
 	http.SetCookie(c.Writer, &http.Cookie{
 		Name:  "AccessToken",
-		Value: key_ses,
+		Value: ses.Token(),
 		Path:  "/",
 		// MaxAge:   3600,
 		// HttpOnly: true,
@@ -102,7 +99,7 @@ func (t *TLoginPost) GetContext(c *gin.Context) {
 	c.Redirect(http.StatusTemporaryRedirect, "/gui/")
 	resp := map[string]interface{}{
 		"status":    1,
-		"token":     key_ses,
+		"token":     ses.Token(),
 		"name":      "",
 		"last_name": "",
 		"message":   "",

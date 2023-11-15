@@ -5,9 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"sync"
+	"time"
 
 	"projects/doc/doc_service/internal/db"
 
+	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 )
 
@@ -20,6 +22,10 @@ type ISession interface {
 
 	GetCurrentPage() string
 	SetCurrentPage(string)
+
+	Token() string
+	CloseSocket()
+	OpenSocket()
 }
 
 type TConn struct {
@@ -27,7 +33,18 @@ type TConn struct {
 	*websocket.Conn //Веб сокет для ответов из потока
 }
 
+type tOnline struct {
+	sync.Mutex
+	online bool
+	close  time.Time
+}
+
 type TSession struct {
+	token string
+	// Время закрытия сессии
+	update time.Time
+	online tOnline
+
 	authorization bool
 	login         string
 	rights        TRights
@@ -37,7 +54,10 @@ type TSession struct {
 }
 
 func NewSession(hash string) (ISession, error) {
-	t := &TSession{}
+	t := &TSession{
+		token:  uuid.NewString(),
+		update: time.Now(),
+	}
 
 	var buf []byte
 	var user db.Users
@@ -60,7 +80,43 @@ func NewSession(hash string) (ISession, error) {
 
 	t.authorization = true
 
+	go t.monitor()
+
 	return t, nil
+}
+
+// monitor -- проверка онлайна пользователя
+func (t *TSession) monitor() {
+	check := func() bool {
+		t.online.Lock()
+		defer t.online.Unlock()
+
+		if !t.online.online {
+			duration := t.update.Sub(t.online.close)
+			if duration.Minutes() > 5 {
+				//удаляем сессию
+				Ses.Delete(t.token)
+				return true
+			}
+		}
+		return false
+	}
+	for {
+		time.Sleep(time.Second * 30)
+		if check() {
+			return
+		}
+		t.update = time.Now()
+
+	}
+}
+
+func (t *TSession) OpenSocket() {
+	t.online.online = true
+}
+
+func (t *TSession) Token() string {
+	return t.token
 }
 
 func (t *TSession) GetLogin() string {
@@ -74,6 +130,13 @@ func (t *TSession) CherRights(in int) bool {
 		}
 	}
 	return false
+}
+
+func (t *TSession) CloseSocket() {
+	t.online.Lock()
+	t.online.online = false
+	t.online.close = time.Now()
+	t.online.Unlock()
 }
 
 func (t *TSession) Authorization() bool {
