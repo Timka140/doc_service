@@ -41,8 +41,9 @@ func NewServer(address string) (IGrpcServer, error) {
 		return nil, fmt.Errorf("TGrpcServer.NewServer(): не удалось запустить сервер, err=%w", err)
 	}
 
-	sGRPC := grpc.NewServer()            // Подымаем gRPC сервер
-	pb.RegisterServiceServer(sGRPC, srv) // Регистрируем методы gRPC
+	maxSizeOption := grpc.MaxRecvMsgSize(32 * 10e6) //Устанавливаем максимальны размер сообщения 320MB
+	sGRPC := grpc.NewServer(maxSizeOption)          // Подымаем gRPC сервер
+	pb.RegisterServiceServer(sGRPC, srv)            // Регистрируем методы gRPC
 
 	// Регистрация службы ответов на сервере gRPC.
 	reflection.Register(sGRPC)

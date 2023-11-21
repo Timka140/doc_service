@@ -41,7 +41,7 @@ func testWork(wg *sync.WaitGroup, name string) {
 						map[string]interface{}{"label": "red", "cols": []string{"apple", "tomato", "cinnabar", "doubledecker"}},
 						map[string]interface{}{"label": "green", "cols": []string{"guava", "cucumber", "aventurine", "card"}},
 					},
-				})
+				}, nil)
 
 			if err != nil {
 				log.Println("Отправка данных", err)

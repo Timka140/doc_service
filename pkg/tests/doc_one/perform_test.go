@@ -25,7 +25,7 @@ func TestTDocx_Perform(t *testing.T) {
 				map[string]interface{}{"label": "red", "cols": []string{"apple", "tomato", "cinnabar", "doubledecker"}},
 				map[string]interface{}{"label": "green", "cols": []string{"guava", "cucumber", "aventurine", "card"}},
 			},
-		})
+		}, nil)
 
 	if err != nil {
 		log.Println("создание файла", err)

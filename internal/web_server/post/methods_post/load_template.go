@@ -3,6 +3,7 @@ package methods_post
 import (
 	"bytes"
 	"os"
+	"strings"
 
 	"io"
 	"log"
@@ -66,7 +67,7 @@ func (t *TLoadTemplateData) GetContext(c *gin.Context) {
 			log.Println("TLoadTemplateData.GetContext(): чтение файла, err=%w", err)
 			return
 		}
-		name = file.Filename
+		name = strings.ReplaceAll(file.Filename, " ", "_")
 		io.Copy(&data, f)
 		f.Close()
 	}
