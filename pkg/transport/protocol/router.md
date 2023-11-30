@@ -10,11 +10,9 @@
 
 ```bash
 Windows
-protoc --go_out=. --go_opt=paths=source_relative \
-    --go-grpc_out=. --go-grpc_opt=paths=source_relative \
-    pkg/pb/server.proto
+protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative pkg/transport/protocol/protocol.proto
 
-protoc --go_out=plugins=grpc:. pkg\pb\server.proto
+protoc --go_out=plugins=grpc:. pkg/transport/protocol/protocol.proto
 ```
 
 ## Linux

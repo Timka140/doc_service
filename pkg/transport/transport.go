@@ -30,11 +30,14 @@ type TTransport struct {
 }
 
 // Функция NewTransport создает объект Transport и возвращает его
-func NewTransport(address string) (ITransport, error) {
+func NewTransport(address string, info *connect.TCreate) (ITransport, error) {
 	var err error
 	t := &TTransport{}
 
-	t.conn = connect.NewConnect(address)
+	t.conn, err = connect.NewConnect(address, info)
+	if err != nil {
+		return nil, fmt.Errorf("NewTransport(): инициализация соединения err=%w", err)
+	}
 
 	err = t.conn.Open()
 	if err != nil {

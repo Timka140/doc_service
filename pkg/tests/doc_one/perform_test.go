@@ -7,11 +7,15 @@ import (
 	"testing"
 
 	"projects/doc/doc_service/pkg/transport"
+	"projects/doc/doc_service/pkg/transport/connect"
 	"projects/doc/doc_service/pkg/transport/formats/pdf"
 )
 
 func TestTDocx_Perform(t *testing.T) {
-	tr, err := transport.NewTransport("127.0.0.1:8030")
+	tr, err := transport.NewTransport("127.0.0.1:8030", &connect.TCreate{
+		Name:    "Test Doc One",
+		Comment: "Тестовый запуск формирования Doc One",
+	})
 	if err != nil {
 		log.Println("создание транспорта", err)
 	}

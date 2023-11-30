@@ -7,6 +7,19 @@ option go_package = "projects/doc/doc_service/pkg/transport/protocol/grpc-pb;pb"
 option java_multiple_files = true;
 option java_outer_classname = "ProtocolProto";
 
+message CreateService {
+   string sid = 1; // id сервиса
+   string type = 2;
+   bytes pack = 3;
+}
+
+
+message Info {
+   string sid = 1; // id сервиса
+   string type = 2;
+   bytes pack = 3;
+}
+
 message ReportFormat {
    string type = 1; // Тип отчета
    repeated ReportInfo info = 4; // Описание посылки
@@ -30,8 +43,9 @@ message ReportResp { // Формат ответа
 
 //Ping
 message ServerPing {
-   string type = 1; // Тип опроса
-   int64 tm = 2; // Время задержки
+   string sid = 1; // id сервиса
+   string type = 2; // Тип опроса
+   int64 tm = 3; // Время задержки
 }
 
 message PingReq { // Формат запроса
@@ -42,8 +56,28 @@ message PingResp { // Формат ответа
    ServerPing SrvPing = 1;
 }
 
+//Service
+message CreateSrvReq { // Формат запроса
+   CreateService Srv = 1;
+}
+  
+message CreateSrvResp { // Формат ответа
+   CreateService Srv = 1;
+}
+
+//Info
+message InfoReq { // Формат запроса
+   Info SrvInfo = 1;
+}
+  
+message InfoResp { // Формат ответа
+   Info SrvInfo = 1;
+}
+
   
 service Service {
    rpc GenerateReport (ReportReq) returns (ReportResp); // Генерация отчета
    rpc Ping (PingReq) returns (PingResp); // Проверка доступности сервиса
+   rpc Info (InfoReq) returns (InfoResp); // Запрос информации у клиента
+   rpc CreateSrv (CreateSrvReq) returns (CreateSrvResp); // Подключение новго микросервиса
 }

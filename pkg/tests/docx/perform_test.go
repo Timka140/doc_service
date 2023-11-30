@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"projects/doc/doc_service/pkg/transport"
+	"projects/doc/doc_service/pkg/transport/connect"
 	"projects/doc/doc_service/pkg/transport/formats/pdf"
 )
 
@@ -15,7 +16,7 @@ func TestTDocx_Perform(t *testing.T) {
 	var wg sync.WaitGroup
 
 	start := time.Now()
-	for index := 0; index < 4; index++ {
+	for index := 0; index < 1; index++ {
 		testWork(&wg, fmt.Sprintf("work_%v", index))
 	}
 	wg.Wait()
@@ -26,14 +27,17 @@ func TestTDocx_Perform(t *testing.T) {
 func testWork(wg *sync.WaitGroup, name string) {
 	wg.Add(1)
 	go func(wg *sync.WaitGroup, name string) {
-		tr, err := transport.NewTransport("127.0.0.1:8030")
+		tr, err := transport.NewTransport("127.0.0.1:8030", &connect.TCreate{
+			Name:    "Test Docx",
+			Comment: "Тестовый запуск формирования DOCX",
+		})
 		if err != nil {
 			log.Println("создание транспорта", err)
 		}
 
-		for index := 0; index < 100000; index++ {
+		for index := 0; index < 1; index++ {
 
-			res_docx, err := tr.DocxPerform("14",
+			res_docx, err := tr.DocxPerform("17",
 				map[string]interface{}{
 					"col_labels": []string{"fruit", "vegetable", "stone", "thing"},
 					"tbl_contents": []interface{}{

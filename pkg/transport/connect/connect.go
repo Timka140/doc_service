@@ -3,6 +3,7 @@ package connect
 import (
 	"fmt"
 
+	"github.com/google/uuid"
 	"google.golang.org/grpc/credentials/insecure"
 
 	pb "projects/doc/doc_service/pkg/transport/protocol"
@@ -16,17 +17,30 @@ type IConnect interface {
 	GetConn() pb.ServiceClient // Получаем соединение
 }
 type TConnect struct {
-	address string           // Адрес, с которым будет установлено соединение
-	cConn   *grpc.ClientConn // Клиентское подключение grpc
-	conn    pb.ServiceClient // Клиент для взаимодействия с сервисом
+	sid     string
+	address string // Адрес, с которым будет установлено соединение
+	ping    int64
+
+	info  *TCreate
+	cConn *grpc.ClientConn // Клиентское подключение grpc
+	conn  pb.ServiceClient // Клиент для взаимодействия с сервисом
 }
 
 // Инициализация нового соединения
-func NewConnect(address string) IConnect {
+func NewConnect(address string, info *TCreate) (IConnect, error) {
+	if info == nil {
+		return nil, fmt.Errorf("NewConnect(): информация о сервисе не задана")
+	}
+
+	if info.Name == "" {
+		return nil, fmt.Errorf("NewConnect(): название сервиса не указано")
+	}
+
 	t := &TConnect{
+		sid:     uuid.NewString(),
 		address: address,
 	}
-	return t
+	return t, nil
 }
 
 // Open устанавливает соединение с адресом, указанным в поле address
@@ -41,6 +55,10 @@ func (t *TConnect) Open() error {
 	}
 
 	t.conn = pb.NewServiceClient(t.cConn) // Создаем клиента для взаимодействия со службой
+
+	t.create(t.info)
+
+	t.listenPing() //инициализируем пинг
 
 	return nil // Успешное открытие соединения
 }

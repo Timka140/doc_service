@@ -6,11 +6,15 @@ import (
 	"testing"
 
 	"projects/doc/doc_service/pkg/transport"
+	"projects/doc/doc_service/pkg/transport/connect"
 	"projects/doc/doc_service/pkg/transport/formats/pdf"
 )
 
 func TestPdf_Perform(t *testing.T) {
-	tr, err := transport.NewTransport("127.0.0.1:8030")
+	tr, err := transport.NewTransport("127.0.0.1:8030", &connect.TCreate{
+		Name:    "Test PDF",
+		Comment: "Тестовый запуск формирования PDF",
+	})
 	if err != nil {
 		log.Println("создание транспорта", err)
 	}
