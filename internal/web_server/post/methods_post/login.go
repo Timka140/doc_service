@@ -53,8 +53,8 @@ func (t *TLoginPost) GetContext(c *gin.Context) {
 		return
 	}
 
-	login = "bondarenkotg"
-	password = "B~G|sUGP7bN%"
+	// login = "bondarenkotg"
+	// password = "B~G|sUGP7bN%"
 
 	// login := c.Request.FormValue("login")
 	// password := c.Request.FormValue("password")
