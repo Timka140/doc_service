@@ -3,6 +3,7 @@ package monitor
 import (
 	"log"
 	"os"
+	"projects/doc/doc_service/internal/services"
 	"projects/doc/doc_service/internal/web_server/sessions"
 	"projects/doc/doc_service/pkg/types"
 	"sync"
@@ -30,11 +31,12 @@ func New() (types.IMonitor, error) {
 		next: make(chan bool, 100),
 	}
 
-	t.run()
+	t.tasks()
+	t.services()
 
 	return t, nil
 }
-func (t *tMonitor) run() {
+func (t *tMonitor) tasks() {
 	go func() {
 		for {
 			time.Sleep(1 * time.Second)
@@ -75,6 +77,29 @@ func (t *tMonitor) run() {
 				}
 				t.store.Unlock()
 			}
+		}
+	}()
+}
+
+func (t *tMonitor) services() {
+	go func() {
+		for {
+			time.Sleep(500 * time.Millisecond)
+			sr := services.ServicesList()
+			sessions.Ses.RangeSes(func(ses sessions.ISession) {
+				defer func() {
+					if r := recover(); r != nil {
+						log.Printf("NewGet(): критическая ошибка, err=%v", r)
+					}
+				}()
+				if ses.GetCurrentPage() != "/gui/" {
+					return
+				}
+				ses.SendMessage(map[string]interface{}{
+					"tp":       "ServicesList",
+					"services": sr,
+				})
+			})
 		}
 	}()
 }

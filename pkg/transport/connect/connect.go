@@ -39,6 +39,7 @@ func NewConnect(address string, info *TCreate) (IConnect, error) {
 	t := &TConnect{
 		sid:     uuid.NewString(),
 		address: address,
+		info:    info,
 	}
 	return t, nil
 }

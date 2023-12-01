@@ -13,7 +13,6 @@ type TCreate struct {
 }
 
 func (t *TConnect) create(in *TCreate) error {
-
 	pack, _ := json.Marshal(in)
 	_, err := t.conn.CreateSrv(context.Background(), &pb.CreateSrvReq{Srv: &pb.CreateService{Sid: t.sid, Pack: pack}})
 	if err != nil {

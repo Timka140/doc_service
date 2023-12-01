@@ -27,7 +27,7 @@ type IService interface {
 type IServices interface {
 	Add(key string, srv IService) error
 	Get(key string) (IService, error)
-	Range(in *TInServices, fn func(page IService)) error
+	Range(fn func(srv IService)) error
 	Delete(key string)
 }
 
@@ -75,7 +75,7 @@ func (t *TServices) Delete(key string) {
 	delete(t.constructors, key)
 }
 
-func (t *TServices) Range(in *TInServices, fn func(srv IService)) error {
+func (t *TServices) Range(fn func(srv IService)) error {
 	if fn == nil {
 		return fmt.Errorf("TConstructorXlsx.Get(): ключ не задан")
 	}

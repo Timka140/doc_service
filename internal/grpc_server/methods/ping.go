@@ -11,6 +11,7 @@ import (
 
 // Ping проверяет соединение и задержку.
 func (t *TMethods) Ping(ctx context.Context, in *pb.PingReq) (out *pb.PingResp, err error) {
+	// time.Sleep(time.Duration(rand.Intn(30)) * time.Millisecond)
 	start := time.Now()
 	end := time.UnixMilli(in.SrvPing.Tm)
 	ms := start.Sub(end).Milliseconds()

@@ -15,3 +15,16 @@ func init() {
 		os.Exit(1)
 	}
 }
+
+func ServicesList() []map[string]interface{} {
+	var data []map[string]interface{}
+	Services.Range(func(srv IService) {
+		data = append(data, map[string]interface{}{
+			"name":    srv.Name(),
+			"comment": srv.Comment(),
+			"ping":    srv.Ping(),
+		})
+	})
+
+	return data
+}

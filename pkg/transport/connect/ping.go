@@ -10,7 +10,7 @@ import (
 func (t *TConnect) listenPing() {
 	go func() {
 		for {
-			time.Sleep(200 * time.Millisecond)
+			time.Sleep(500 * time.Millisecond)
 			start := time.Now()
 			resp, err := t.conn.Ping(context.Background(), &pb.PingReq{
 				SrvPing: &pb.ServerPing{Sid: t.sid, Tm: time.Now().UnixMilli()},
