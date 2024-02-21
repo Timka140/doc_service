@@ -23,11 +23,18 @@ func (t *TService) startService() error {
 		return fmt.Errorf("start_service(): отсутствует микросервис для windows")
 	}
 
+	// switch runtime.GOOS {
+	// case "windows":
+	// 	t.cmd = exec.Command("./docx_service.exe", t.pid, fmt.Sprintf("%v:%v", t.host, t.port), t.auth)
+	// case "linux":
+	// 	t.cmd = exec.Command("./docx_service", t.pid, fmt.Sprintf("%v:%v", t.host, t.port), t.auth)
+	// }
+
 	switch runtime.GOOS {
 	case "windows":
-		t.cmd = exec.Command("./docx_service.exe", t.pid, fmt.Sprintf("%v:%v", t.host, t.port), t.auth)
+		t.cmd = exec.Command("docker", "run", "-e", fmt.Sprintf("RabbitURL=%v:%v", t.host, t.port), "-e", fmt.Sprintf("RabbitAuth=%v", t.auth), "-e", "--network=host", "docx-service")
 	case "linux":
-		t.cmd = exec.Command("./docx_service", t.pid, fmt.Sprintf("%v:%v", t.host, t.port), t.auth)
+		t.cmd = exec.Command("docker", "run", "-e", fmt.Sprintf("RabbitURL=%v:%v", t.host, t.port), "-e", fmt.Sprintf("RabbitAuth=%v", t.auth), "-e", "--network=host", "docx-service")
 	}
 
 	var stdout bytes.Buffer

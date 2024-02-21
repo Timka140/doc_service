@@ -19,7 +19,7 @@ func TestPdf_Perform(t *testing.T) {
 		log.Println("создание транспорта", err)
 	}
 
-	doc1, err := os.ReadFile("1.docx")
+	doc1, err := os.ReadFile("index.html")
 	if err != nil {
 		log.Println("Загрузка документа", err)
 	}
@@ -32,7 +32,7 @@ func TestPdf_Perform(t *testing.T) {
 		Files: []*pdf.TFile{
 			{
 				FileData: doc1,
-				Ext:      "docx",
+				Ext:      "html",
 				Name:     "test_1",
 			},
 			// {
@@ -55,7 +55,7 @@ func TestPdf_Perform(t *testing.T) {
 		return
 	}
 
-	f, err := os.Create(res.Name + "." + res.Ext)
+	f, err := os.Create("test." + res.Ext)
 	if err != nil {
 		log.Println("создание файла", err)
 	}

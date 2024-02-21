@@ -25,6 +25,7 @@ func (t *TDocxInteraction) Connect() error {
 		return fmt.Errorf("TDocxInteraction.Connect() RabbitPort неуказан")
 	}
 
+	// t.conn, err = amqp.Dial("amqp://doc_service:doc_123@192.168.0.43:5672/")
 	t.conn, err = amqp.Dial(fmt.Sprintf("amqp://%v@%v:%v/", rabbitAuth, rabbitHost, rabbitPort))
 	if err != nil {
 		return fmt.Errorf("TDocxInteraction.Connect() установка соединения, err=%w", err)

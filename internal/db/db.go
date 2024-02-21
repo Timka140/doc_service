@@ -5,6 +5,9 @@ import (
 	"database/sql"
 	"encoding/hex"
 	"fmt"
+	"log"
+	"os"
+	"path/filepath"
 	"sync"
 
 	"gorm.io/driver/sqlite"
@@ -26,8 +29,15 @@ type TDB struct {
 }
 
 func NewDB() error {
+
+	docStore := os.Getenv("DocStore")
+	if docStore == "" {
+		log.Println("NewDB(): DocStore не установлена в .env")
+		os.Exit(1)
+	}
+
 	t := &TDB{}
-	db, err := gorm.Open(sqlite.Open(file_sql), &gorm.Config{})
+	db, err := gorm.Open(sqlite.Open(filepath.Join(docStore, file_sql)), &gorm.Config{})
 	// db, err := sql.Open("sqlite3", file_sql)
 	if err != nil {
 		return fmt.Errorf("NewDB(): открытие базы данных, err=%w", err)

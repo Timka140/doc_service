@@ -21,14 +21,20 @@ func main() {
 	}
 
 	serviceHost := os.Getenv("DocServiceHost")
-	if serviceHost == "" {
-		log.Println("DocServiceHost не установлена в .env")
+	// if serviceHost == "" {
+	// 	log.Println("DocServiceHost не установлена в .env")
+	// 	os.Exit(1)
+	// }
+
+	servicePort := os.Getenv("DocServicePort")
+	if servicePort == "" {
+		log.Println("DocServicePort не установлена в .env")
 		os.Exit(1)
 	}
 
-	servicePort := os.Getenv("DocServicePort")
-	if serviceHost == "" {
-		log.Println("DocServicePort не установлена в .env")
+	docStore := os.Getenv("DocStore")
+	if docStore == "" {
+		log.Println("main(): DocStore не установлена в .env")
 		os.Exit(1)
 	}
 
@@ -42,7 +48,7 @@ func main() {
 		log.Fatalf("main(): инициализация базы данных, err=%v", err)
 	}
 
-	err = os.MkdirAll(filepath.Join("./store"), 0755)
+	err = os.MkdirAll(filepath.Join(docStore), 0755)
 	if err != nil {
 		log.Fatalf("main(): создание папки, err=%v", err)
 	}
