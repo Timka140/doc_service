@@ -39,11 +39,11 @@ func NewMethodsPost() (IMethodsPost, error) {
 }
 func (t *TMethodsPost) Add(key string, fn func(in *TInPostPage) IPostPage) error {
 	if key == "" {
-		return fmt.Errorf("TConstructorXlsx.Add(): ключ не задан")
+		return fmt.Errorf("TMethodsPost.Add(): ключ не задан")
 	}
 
 	if fn == nil {
-		return fmt.Errorf("TConstructorXlsx.Add(): конструктор не задан")
+		return fmt.Errorf("TMethodsPost.Add(): конструктор не задан")
 	}
 
 	t.constructors[key] = fn
@@ -52,19 +52,19 @@ func (t *TMethodsPost) Add(key string, fn func(in *TInPostPage) IPostPage) error
 
 func (t *TMethodsPost) Get(key string) (func(in *TInPostPage) IPostPage, error) {
 	if key == "" {
-		return nil, fmt.Errorf("TConstructorXlsx.Get(): ключ не задан")
+		return nil, fmt.Errorf("TMethodsPost.Get(): ключ не задан")
 	}
 
 	fn, ok := t.constructors[key]
 	if !ok {
-		return nil, fmt.Errorf("TConstructorXlsx.Get(): конструктор не найден")
+		return nil, fmt.Errorf("TMethodsPost.Get(): конструктор не найден")
 	}
 	return fn, nil
 }
 
 func (t *TMethodsPost) Range(in *TInPostPage, fn func(page IPostPage)) error {
 	if fn == nil {
-		return fmt.Errorf("TConstructorXlsx.Get(): ключ не задан")
+		return fmt.Errorf("TMethodsPost.Get(): ключ не задан")
 	}
 
 	for _, pConstruct := range t.constructors {

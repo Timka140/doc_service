@@ -41,11 +41,11 @@ func NewMethodsSocket() (IMethodsSocket, error) {
 }
 func (t *TMethodsSocket) Add(key string, fn func(in *TSocketValue) (ISocket, error)) error {
 	if key == "" {
-		return fmt.Errorf("TConstructorXlsx.Add(): ключ не задан")
+		return fmt.Errorf("TMethodsSocket.Add(): ключ не задан")
 	}
 
 	if fn == nil {
-		return fmt.Errorf("TConstructorXlsx.Add(): конструктор не задан")
+		return fmt.Errorf("TMethodsSocket.Add(): конструктор не задан")
 	}
 
 	t.constructors[key] = fn
@@ -66,13 +66,13 @@ func (t *TMethodsSocket) Get(key string) (func(in *TSocketValue) (ISocket, error
 
 func (t *TMethodsSocket) Range(in *TSocketValue, fn func(page ISocket)) error {
 	if fn == nil {
-		return fmt.Errorf("TConstructorXlsx.Get(): ключ не задан")
+		return fmt.Errorf("TMethodsSocket.Get(): ключ не задан")
 	}
 
 	for _, pConstruct := range t.constructors {
 		f, err := pConstruct(in)
 		if err != nil {
-			return fmt.Errorf("TConstructorXlsx.Get(): создание процесса, err=%w", err)
+			return fmt.Errorf("TMethodsSocket.Get(): создание процесса, err=%w", err)
 		}
 		fn(f)
 	}

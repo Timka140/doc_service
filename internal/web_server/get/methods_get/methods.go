@@ -41,11 +41,11 @@ func NewMethodsGet() (IMethodsGet, error) {
 }
 func (t *TMethodsGet) Add(key string, fn func(in *TInGetPage) IGetPage) error {
 	if key == "" {
-		return fmt.Errorf("TConstructorXlsx.Add(): ключ не задан")
+		return fmt.Errorf("TMethodsGet.Add(): ключ не задан")
 	}
 
 	if fn == nil {
-		return fmt.Errorf("TConstructorXlsx.Add(): конструктор не задан")
+		return fmt.Errorf("TMethodsGet.Add(): конструктор не задан")
 	}
 
 	t.constructors[key] = fn
@@ -54,19 +54,19 @@ func (t *TMethodsGet) Add(key string, fn func(in *TInGetPage) IGetPage) error {
 
 func (t *TMethodsGet) Get(key string) (func(in *TInGetPage) IGetPage, error) {
 	if key == "" {
-		return nil, fmt.Errorf("TConstructorXlsx.Get(): ключ не задан")
+		return nil, fmt.Errorf("TMethodsGet.Get(): ключ не задан")
 	}
 
 	fn, ok := t.constructors[key]
 	if !ok {
-		return nil, fmt.Errorf("TConstructorXlsx.Get(): конструктор не найден")
+		return nil, fmt.Errorf("TMethodsGet.Get(): конструктор не найден")
 	}
 	return fn, nil
 }
 
 func (t *TMethodsGet) Range(in *TInGetPage, fn func(page IGetPage)) error {
 	if fn == nil {
-		return fmt.Errorf("TConstructorXlsx.Get(): ключ не задан")
+		return fmt.Errorf("TMethodsGet.Get(): ключ не задан")
 	}
 
 	for _, pConstruct := range t.constructors {

@@ -48,11 +48,11 @@ func New() (IServices, error) {
 }
 func (t *TServices) Add(key string, srv IService) error {
 	if key == "" {
-		return fmt.Errorf("TConstructorXlsx.Add(): ключ не задан")
+		return fmt.Errorf("TServices.Add(): ключ не задан")
 	}
 
 	if srv == nil {
-		return fmt.Errorf("TConstructorXlsx.Add(): конструктор не задан")
+		return fmt.Errorf("TServices.Add(): конструктор не задан")
 	}
 
 	t.constructors[key] = srv
@@ -61,12 +61,12 @@ func (t *TServices) Add(key string, srv IService) error {
 
 func (t *TServices) Get(key string) (IService, error) {
 	if key == "" {
-		return nil, fmt.Errorf("TConstructorXlsx.Get(): ключ не задан")
+		return nil, fmt.Errorf("TServices.Get(): ключ не задан")
 	}
 
 	fn, ok := t.constructors[key]
 	if !ok {
-		return nil, fmt.Errorf("TConstructorXlsx.Get(): конструктор не найден")
+		return nil, fmt.Errorf("TServices.Get(): конструктор не найден, constructor = %v", key)
 	}
 	return fn, nil
 }
@@ -77,7 +77,7 @@ func (t *TServices) Delete(key string) {
 
 func (t *TServices) Range(fn func(srv IService)) error {
 	if fn == nil {
-		return fmt.Errorf("TConstructorXlsx.Get(): ключ не задан")
+		return fmt.Errorf("TServices.Get(): ключ не задан")
 	}
 
 	for _, pConstruct := range t.constructors {
