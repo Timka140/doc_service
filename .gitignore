@@ -11,6 +11,7 @@ __debug_*
 vendor
 main.exe
 DocService.exe
+doc-service
 
 
 #Vue
