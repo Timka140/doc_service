@@ -2,7 +2,7 @@ package methods
 
 import (
 	"context"
-	"log"
+	"fmt"
 	"time"
 
 	"projects/doc/doc_service/internal/services"
@@ -16,15 +16,12 @@ func (t *TMethods) Ping(ctx context.Context, in *pb.PingReq) (out *pb.PingResp, 
 	end := time.UnixMilli(in.SrvPing.Tm)
 	ms := start.Sub(end).Milliseconds()
 
-	func() {
-		srv, err := services.Services.Get(in.SrvPing.Sid)
-		if err != nil {
-			log.Printf("Info(): обращение к микросервису, err=%v", err)
-			return
-		}
-		srv.SetPing(ms)
-	}()
+	srv, err := services.Services.Get(in.SrvPing.Sid)
+	if err != nil {
+		return &pb.PingResp{SrvPing: in.SrvPing}, fmt.Errorf("Info(): обращение к микросервису, err=%w", err)
+	}
+	srv.SetPing(ms)
 
-	in.SrvPing.Tm = start.UnixMilli()
+	in.SrvPing.Tm = end.UnixMilli()
 	return &pb.PingResp{SrvPing: in.SrvPing}, nil
 }

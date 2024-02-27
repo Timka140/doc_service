@@ -57,6 +57,10 @@ type TFile struct {
 
 // GenerateReport() Создает отчет в зависимости от формата
 func (t *TMethods) GenerateReport(val TGenerateReports) (res *TGenerateReportRespPack, err error) {
+	if t.conn == nil {
+		return nil, fmt.Errorf("TMethods.GenerateReport(): Соединение закрыто, err=%w", err)
+	}
+
 	pb, err := t.conn.GenerateReport(context.Background(), &pb.ReportReq{
 		SrvAdr: &pb.ReportFormat{
 			Type: "Render",
