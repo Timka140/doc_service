@@ -3,7 +3,6 @@ package service
 import (
 	"bytes"
 	"fmt"
-	"os"
 	"os/exec"
 	"runtime"
 )
@@ -15,13 +14,13 @@ func (t *TService) startService() error {
 	// 	log.Println(err)
 	// }
 	// fmt.Println(path)
-	if _, err := os.Stat("./docx_service"); os.IsNotExist(err) {
-		return fmt.Errorf("start_service(): отсутствует микросервис для linux")
-	}
+	// if _, err := os.Stat("./docx-service"); os.IsNotExist(err) {
+	// 	return fmt.Errorf("start_service(): отсутствует микросервис для linux")
+	// }
 
-	if _, err := os.Stat("./docx_service.exe"); os.IsNotExist(err) {
-		return fmt.Errorf("start_service(): отсутствует микросервис для windows")
-	}
+	// if _, err := os.Stat("./docx-service.exe"); os.IsNotExist(err) {
+	// 	return fmt.Errorf("start_service(): отсутствует микросервис для windows")
+	// }
 
 	// switch runtime.GOOS {
 	// case "windows":
@@ -32,9 +31,9 @@ func (t *TService) startService() error {
 
 	switch runtime.GOOS {
 	case "windows":
-		t.cmd = exec.Command("docker", "run", "-e", fmt.Sprintf("RabbitURL=%v:%v", t.host, t.port), "-e", fmt.Sprintf("RabbitAuth=%v", t.auth), "-e", "--network=host", "docx-service")
+		t.cmd = exec.Command("docker", "run", "-e", fmt.Sprintf("RabbitURL=%v:%v", t.host, t.port), "-e", fmt.Sprintf("RabbitAuth=%v", t.auth), "-e", fmt.Sprintf("WebPort=%v", 8030), "-e", "--network=host", "docx-service")
 	case "linux":
-		t.cmd = exec.Command("docker", "run", "-e", fmt.Sprintf("RabbitURL=%v:%v", t.host, t.port), "-e", fmt.Sprintf("RabbitAuth=%v", t.auth), "-e", "--network=host", "docx-service")
+		t.cmd = exec.Command("docker", "run", "-e", fmt.Sprintf("RabbitURL=%v:%v", t.host, t.port), "-e", fmt.Sprintf("RabbitAuth=%v", t.auth), "-e", fmt.Sprintf("WebPort=%v", 8030), "-e", "--network=host", "docx-service")
 	}
 
 	var stdout bytes.Buffer
@@ -45,9 +44,8 @@ func (t *TService) startService() error {
 	if err != nil {
 		fmt.Println(stdout.String())
 		fmt.Println(stderr.String())
-		return fmt.Errorf("[ERROR] запуск сервиса docx_service: %v", err)
+		return fmt.Errorf("[ERROR] запуск сервиса docx-service: %v", err)
 	}
-
 	return nil
 }
 

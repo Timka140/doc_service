@@ -27,9 +27,9 @@ func (t *TService) startService() error {
 	// fmt.Sprintf("RabbitURL=%v:%v", t.host, t.port), "./pdf"
 	switch runtime.GOOS {
 	case "windows":
-		t.cmd = exec.Command("docker", "run", "-e", fmt.Sprintf("RabbitURL=%v:%v", t.host, t.port), "-e", fmt.Sprintf("RabbitAuth=%v", t.auth), "-e", "PdfOut=./pdf", "--network=host", "pdf-service")
+		t.cmd = exec.Command("docker", "run", "-e", fmt.Sprintf("RabbitURL=%v:%v", t.host, t.port), "-e", fmt.Sprintf("RabbitAuth=%v", t.auth), "-e", "PdfOut=./pdf", "-e", fmt.Sprintf("WebPort=%v", 8030), "-e", "--network=host", "pdf-service")
 	case "linux":
-		t.cmd = exec.Command("docker", "run", "-e", fmt.Sprintf("RabbitURL=%v:%v", t.host, t.port), "-e", fmt.Sprintf("RabbitAuth=%v", t.auth), "-e", "PdfOut=./pdf", "--network=host", "pdf-service")
+		t.cmd = exec.Command("docker", "run", "-e", fmt.Sprintf("RabbitURL=%v:%v", t.host, t.port), "-e", fmt.Sprintf("RabbitAuth=%v", t.auth), "-e", "PdfOut=./pdf", "-e", fmt.Sprintf("WebPort=%v", 8030), "-e", "--network=host", "pdf-service")
 		// t.cmd = exec.Command("./docx_service", t.pid, t.host, t.port)
 	}
 
@@ -39,9 +39,7 @@ func (t *TService) startService() error {
 	t.cmd.Stderr = &stderr
 	err = t.cmd.Start()
 	if err != nil {
-		fmt.Println(stdout.String())
-		fmt.Println(stderr.String())
-		return fmt.Errorf("[ERROR] запуск сервиса docx_service: %v", err)
+		return fmt.Errorf("[ERROR] запуск сервиса pdf-service: %v", err)
 	}
 
 	return nil

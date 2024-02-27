@@ -1,0 +1,1 @@
+go build -o doc-service.exe ./cmd/doc_service/main.go
