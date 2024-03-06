@@ -43,7 +43,9 @@ func (t *TIsLogin) GetContext(c *gin.Context) {
 	if ses != nil {
 		login = ses.Authorization()
 	}
-	if login {
+
+	api, ok := params["api"].(string)
+	if ok && login && api == "true" {
 		ses.Online()
 	}
 

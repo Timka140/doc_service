@@ -106,7 +106,7 @@ func (t *TSession) monitor() {
 		// Если авторизация через api смотрю последний online
 		if t.online.onlineTime != nil {
 			duration := t.update.Sub(*t.online.onlineTime)
-			if duration.Minutes() > 1 {
+			if duration.Minutes() > 5 {
 				t.online.online = false
 				t.online.close = *t.online.onlineTime
 				Ses.Delete(t.token)

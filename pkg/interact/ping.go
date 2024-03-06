@@ -10,7 +10,9 @@ import (
 
 // /v1/isLogin
 func (t *TInteract) ping() error {
-	data := map[string]string{}
+	data := map[string]string{
+		"api": "true",
+	}
 
 	// Кодируем данные в JSON
 	jsonData, err := json.Marshal(data)
