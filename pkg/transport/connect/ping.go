@@ -36,6 +36,7 @@ func (t *TConnect) listenPing() {
 			if err != nil {
 				log.Printf("connect.ping(): опрос сервера, err=%v", err)
 				t.reconnect() //Запуск переподключения
+				continue
 			}
 			start := time.UnixMilli(resp.SrvPing.Tm)
 			end := time.Now()

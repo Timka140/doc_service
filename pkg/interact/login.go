@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"time"
 )
 
 func (t *TInteract) Login(login, password string) error {
@@ -21,7 +22,7 @@ func (t *TInteract) Login(login, password string) error {
 	}
 
 	// Создаем HTTP-запрос типа POST с телом в формате JSON
-	req, err := http.NewRequest("POST", fmt.Sprintf("%v://%v/api/login", t.Protocol, t.Address), bytes.NewBuffer(jsonData))
+	req, err := http.NewRequest("POST", fmt.Sprintf("%v://%v/api/v1/login", t.Protocol, t.Address), bytes.NewBuffer(jsonData))
 	if err != nil {
 		return fmt.Errorf("Login(): создание запроса, err=%w", err)
 	}
@@ -57,5 +58,36 @@ func (t *TInteract) Login(login, password string) error {
 		t.token = token
 	}
 
+	t.close = make(chan bool, 10)
+
+	go func() {
+		for {
+
+			if err := t.ping(); err != nil {
+				fmt.Printf("Login(): запрос ping, err=%v", err)
+				return
+			}
+
+			select {
+			case c := <-t.close:
+				if c {
+					close(t.close)
+					return
+				}
+			default:
+				time.Sleep(20 * time.Second)
+			}
+		}
+	}()
+
 	return nil
+}
+
+func (t *TInteract) Close() {
+	_, ok := <-t.close
+	if !ok {
+		return
+	}
+
+	t.close <- true
 }

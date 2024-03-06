@@ -26,6 +26,8 @@ type ISession interface {
 	Token() string
 	CloseSocket()
 	OpenSocket()
+
+	Online()
 }
 
 type TConn struct {
@@ -35,8 +37,9 @@ type TConn struct {
 
 type tOnline struct {
 	sync.Mutex
-	online bool
-	close  time.Time
+	online     bool
+	onlineTime *time.Time
+	close      time.Time
 }
 
 type TSession struct {
@@ -99,6 +102,17 @@ func (t *TSession) monitor() {
 				return true
 			}
 		}
+
+		// Если авторизация через api смотрю последний online
+		if t.online.onlineTime != nil {
+			duration := t.update.Sub(*t.online.onlineTime)
+			if duration.Minutes() > 1 {
+				t.online.online = false
+				t.online.close = *t.online.onlineTime
+				Ses.Delete(t.token)
+				return true
+			}
+		}
 		return false
 	}
 	for {
@@ -130,6 +144,14 @@ func (t *TSession) CherRights(in int) bool {
 		}
 	}
 	return false
+}
+
+func (t *TSession) Online() {
+	t.online.Lock()
+	tm := time.Now()
+	t.online.online = true
+	t.online.onlineTime = &tm
+	t.online.Unlock()
 }
 
 func (t *TSession) CloseSocket() {

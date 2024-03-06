@@ -43,6 +43,9 @@ func (t *TIsLogin) GetContext(c *gin.Context) {
 	if ses != nil {
 		login = ses.Authorization()
 	}
+	if login {
+		ses.Online()
+	}
 
 	path, ok := params["path"].(string)
 	if ok && ses != nil {

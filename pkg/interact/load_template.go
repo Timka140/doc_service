@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-func (t *TInteract) LoadTemplate(id string, file *bytes.Buffer) error {
+func (t *TInteract) LoadTemplate(id, name string, file *bytes.Buffer) error {
 	if id == "" {
 		return fmt.Errorf("LoadTemplate(): id шаблона не задан")
 	}
@@ -21,7 +21,7 @@ func (t *TInteract) LoadTemplate(id string, file *bytes.Buffer) error {
 	writer := multipart.NewWriter(body)
 
 	// Добавляем файл
-	part, err := writer.CreateFormFile("file", "example.txt")
+	part, err := writer.CreateFormFile("file", name)
 	if err != nil {
 		return fmt.Errorf("LoadTemplate(): создание файла, err=%w", err)
 	}

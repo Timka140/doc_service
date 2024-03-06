@@ -1,14 +1,22 @@
 package interact
 
-import "fmt"
+import (
+	"bytes"
+	"fmt"
+)
 
 type IInteract interface {
 	Login(login, password string) error
+	Close()
+
+	LoadTemplate(id, name string, file *bytes.Buffer) error
 }
 
 type TInteract struct {
 	Protocol string
 	Address  string
+
+	close chan bool
 
 	token string
 }
