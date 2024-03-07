@@ -2,6 +2,7 @@ package methods_post
 
 import (
 	"bytes"
+	"fmt"
 	"os"
 	"strings"
 
@@ -59,6 +60,7 @@ func (t *TLoadTemplateData) GetContext(c *gin.Context) {
 	}
 
 	var name string
+	var ext string
 	var data bytes.Buffer
 
 	for _, file := range file {
@@ -68,6 +70,7 @@ func (t *TLoadTemplateData) GetContext(c *gin.Context) {
 			return
 		}
 		name = strings.ReplaceAll(file.Filename, " ", "_")
+		ext = filepath.Ext(name)
 		io.Copy(&data, f)
 		f.Close()
 	}
@@ -78,7 +81,7 @@ func (t *TLoadTemplateData) GetContext(c *gin.Context) {
 		log.Println("TLoadTemplateData.GetContext(): создание папки, err=%w", err)
 	}
 
-	pFile := filepath.Join(catalog, name)
+	pFile := filepath.Join(catalog, fmt.Sprintf("%v%v", template_id, ext))
 	f, err := os.Create(pFile)
 	if err != nil {
 		log.Println("TLoadTemplateData.GetContext(): создание файла, err=%w", err)
@@ -95,7 +98,7 @@ func (t *TLoadTemplateData) GetContext(c *gin.Context) {
 		Name: name,
 		// Data:   data.Bytes(),
 		Update:       time.Now().Format(time.RFC3339Nano),
-		Ext:          filepath.Ext(name),
+		Ext:          ext,
 		PathTemplate: pFile,
 	}
 
