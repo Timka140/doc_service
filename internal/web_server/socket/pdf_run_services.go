@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"projects/doc/doc_service/internal/pdf_service"
+	"projects/doc/doc_service/internal/web_server/sessions"
 	"strconv"
 	"sync"
 
@@ -13,6 +14,7 @@ import (
 type TRunPdfServices struct {
 	data map[string]interface{}
 	pid  string
+	ses  sessions.ISession
 }
 
 func newRunPdfServicesSocket(in *TSocketValue) (ISocket, error) {
@@ -25,6 +27,9 @@ func newRunPdfServicesSocket(in *TSocketValue) (ISocket, error) {
 }
 
 func (t *TRunPdfServices) Start() error {
+	if !t.ses.Rights([]int{sessions.CAdministrator}) {
+		return nil
+	}
 	var err error
 	execution, ok := t.data["execution"].(string)
 	if !ok {

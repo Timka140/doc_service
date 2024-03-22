@@ -12,7 +12,7 @@ import (
 )
 
 func TestTDocx_Perform(t *testing.T) {
-	tr, err := transport.NewTransport("127.0.0.1:8030", &connect.TCreate{
+	tr, err := transport.NewTransport("127.0.0.1:8030", "", &connect.TCreate{
 		Name:    "Test Doc One",
 		Comment: "Тестовый запуск формирования Doc One",
 	})

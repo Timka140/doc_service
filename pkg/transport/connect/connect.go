@@ -3,7 +3,6 @@ package connect
 import (
 	"fmt"
 
-	"github.com/google/uuid"
 	"google.golang.org/grpc/credentials/insecure"
 
 	pb "projects/doc/doc_service/pkg/transport/protocol"
@@ -15,9 +14,11 @@ type IConnect interface {
 	Open() error               //Установка соединения
 	Close() error              // Закрытие соединения
 	GetConn() pb.ServiceClient // Получаем соединение
+	Token() string             //Ключ сессии
 }
 type TConnect struct {
-	sid     string
+	key     string
+	token   string
 	address string // Адрес, с которым будет установлено соединение
 	ping    int64
 
@@ -27,7 +28,11 @@ type TConnect struct {
 }
 
 // Инициализация нового соединения
-func NewConnect(address string, info *TCreate) (IConnect, error) {
+func NewConnect(address, key string, info *TCreate) (IConnect, error) {
+	if key == "" {
+		return nil, fmt.Errorf("NewConnect(): Ключ авторизации не указан")
+	}
+
 	if info == nil {
 		return nil, fmt.Errorf("NewConnect(): информация о сервисе не задана")
 	}
@@ -37,7 +42,8 @@ func NewConnect(address string, info *TCreate) (IConnect, error) {
 	}
 
 	t := &TConnect{
-		sid:     uuid.NewString(),
+		// token:   uuid.NewString(),
+		key:     key,
 		address: address,
 		info:    info,
 	}
@@ -57,6 +63,10 @@ func (t *TConnect) Open() error {
 
 	t.conn = pb.NewServiceClient(t.cConn) // Создаем клиента для взаимодействия со службой
 
+	err = t.auth()
+	if err != nil {
+		return fmt.Errorf("TServer.Open(): Авторизация: %w", err) // Если произошла ошибка, возвращаем сообщение с ошибкой
+	}
 	t.create(t.info)
 
 	t.listenPing() //инициализируем пинг
@@ -76,4 +86,8 @@ func (t *TConnect) Close() error {
 // GetConn дает доступ к соединению
 func (t *TConnect) GetConn() pb.ServiceClient {
 	return t.conn // Возвращаем соединение
+}
+
+func (t *TConnect) Token() string {
+	return t.token // Ключ авторизации
 }

@@ -89,10 +89,12 @@ func (t *TTemplatesCreate) createCatalog() error {
 		return fmt.Errorf("TTemplatesCreate.createCatalog(): имя не задано")
 	}
 	rows := db.Templates{
-		Name: name,
-		Tp:   tp_temp,
-		Path: ph,
+		Name:   name,
+		Tp:     tp_temp,
+		Path:   ph,
+		UserID: t.ses.ID(),
 	}
+
 	err := db.DB.Table("templates").Create(&rows).Error
 	if err != nil {
 		return fmt.Errorf("TaskCreate.Start(): создание записи, err=%w", err)
@@ -181,9 +183,10 @@ func (t *TTemplatesCreate) createTemplate() error {
 		return fmt.Errorf("TTemplatesCreate.createTemplate(): имя не задано")
 	}
 	row := db.Templates{
-		Name: name,
-		Tp:   tp_temp,
-		Path: ph,
+		Name:   name,
+		Tp:     tp_temp,
+		Path:   ph,
+		UserID: t.ses.ID(),
 	}
 	err := db.DB.Table("templates").Create(&row).Error
 	if err != nil {

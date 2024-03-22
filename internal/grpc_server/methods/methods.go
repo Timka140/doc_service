@@ -12,6 +12,7 @@ type IMethods interface {
 	Ping(context.Context, *pb.PingReq) (*pb.PingResp, error)                // Проверка соединения
 	Info(context.Context, *pb.InfoReq) (*pb.InfoResp, error)                // Информация о микро сервисе
 	CreateSrv(context.Context, *pb.CreateSrvReq) (*pb.CreateSrvResp, error) // Установка соединения
+	Auth(context.Context, *pb.AuthReq) (*pb.AuthResp, error)                //Авторизация
 }
 type TMethods struct {
 	pb.ServiceServer

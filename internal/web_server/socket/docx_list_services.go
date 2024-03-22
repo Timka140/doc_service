@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"projects/doc/doc_service/internal/docx_service"
+	"projects/doc/doc_service/internal/web_server/sessions"
 
 	"github.com/google/uuid"
 )
@@ -11,18 +12,23 @@ import (
 type TListDocxServices struct {
 	data map[string]interface{}
 	pid  string
+	ses  sessions.ISession
 }
 
 func newListDocxServicesSocket(in *TSocketValue) (ISocket, error) {
 	t := &TListDocxServices{
 		data: in.Data,
 		pid:  uuid.NewString(),
+		ses:  in.Ses,
 	}
 
 	return t, nil
 }
 
 func (t *TListDocxServices) Start() error {
+	if !t.ses.Rights([]int{sessions.CAdministrator}) {
+		return nil
+	}
 
 	execution, ok := t.data["execution"].(string)
 	if !ok {

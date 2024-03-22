@@ -3,6 +3,8 @@ package docx_test
 import (
 	"fmt"
 	"log"
+	"os"
+	"path/filepath"
 	"sync"
 	"testing"
 	"time"
@@ -27,7 +29,7 @@ func TestTDocx_Perform(t *testing.T) {
 func testWork(wg *sync.WaitGroup, name string) {
 	wg.Add(1)
 	go func(wg *sync.WaitGroup, name string) {
-		tr, err := transport.NewTransport("127.0.0.1:8030", &connect.TCreate{
+		tr, err := transport.NewTransport("127.0.0.1:8030", "5fb24be9-084a-4b34-80e5-28f21595bae6", &connect.TCreate{
 			Name:    "Test Docx",
 			Comment: "Тестовый запуск формирования DOCX",
 		})
@@ -82,16 +84,16 @@ func testWork(wg *sync.WaitGroup, name string) {
 				return
 			}
 
-			// fmt.Println(res_docx.Name)
+			fmt.Println(res_docx.Name)
 
-			// f, err := os.Create(filepath.Join("res", res_docx.Name+"."+res_pdf.Ext))
-			// if err != nil {
-			// 	log.Println("создание файла", err)
-			// }
+			f, err := os.Create(filepath.Join("res", res_docx.Name+"."+res_pdf.Ext))
+			if err != nil {
+				log.Println("создание файла", err)
+			}
 
-			// f.Write(res_pdf.FileData)
+			f.Write(res_pdf.FileData)
 
-			// f.Close()
+			f.Close()
 
 		}
 		wg.Done()

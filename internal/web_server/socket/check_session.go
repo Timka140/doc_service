@@ -36,6 +36,11 @@ func (t *TCheckSession) GetPid() string {
 }
 
 func (t *TCheckSession) Response() (map[string]interface{}, error) {
+	if t.ses == nil {
+		t.data["login"] = false
+		return t.data, nil
+	}
+
 	t.data["login"] = t.ses.Authorization()
 	return t.data, nil
 }

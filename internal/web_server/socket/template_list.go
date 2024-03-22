@@ -43,14 +43,13 @@ func (t *TTemplateList) Start() error {
 	case "list":
 		err = t.list()
 		if err != nil {
-			return fmt.Errorf("TaskList.Start(): получение списка, err=%w", err)
+			return fmt.Errorf("TemplateList.Start(): получение списка, err=%w", err)
 		}
 	case "open":
 		err = t.open()
 		if err != nil {
-			return fmt.Errorf("TaskList.Start(): открытие, err=%w", err)
+			return fmt.Errorf("TemplateList.Start(): открытие, err=%w", err)
 		}
-
 	}
 	return nil
 }
@@ -89,10 +88,23 @@ func (t *TTemplateList) open() error {
 func (t *TTemplateList) Response() (map[string]interface{}, error) {
 	var err error
 	var rows []db.Tasks
-	err = db.DB.Table("templates").Select("id, path, tp, name, comment").Where("path LIKE ?", t.path).Scan(&rows).Error
-	if err != nil {
-		return nil, fmt.Errorf("TaskList.Start(): чтение таблицы, err=%w", err)
+
+	tx := db.DB.Table("templates").Select("id, path, tp, name, comment")
+	if t.ses.Rights([]int{sessions.CAdministrator}) {
+		tx = tx.Where("path LIKE ?", t.path)
+	} else {
+		tx = tx.Where("path LIKE ? AND user_id = ?", t.path, t.ses.ID())
 	}
+
+	err = tx.Scan(&rows).Error
+	if err != nil {
+		return nil, fmt.Errorf("TemplateList.Start(): чтение таблицы, err=%w", err)
+	}
+
+	// err = db.DB.Table("templates").Select("id, path, tp, name, comment").Where("path LIKE ?", t.path).Scan(&rows).Error
+	// if err != nil {
+	// 	return nil, fmt.Errorf("TemplateList.Start(): чтение таблицы, err=%w", err)
+	// }
 
 	t.data["temps"] = rows
 	t.data["path"] = t.path
@@ -107,6 +119,6 @@ func (t *TTemplateList) Stop() error {
 func init() {
 	err := constructors.Add("TemplateList", newTemplateListSocket)
 	if err != nil {
-		log.Printf("TaskList(): не удалось добавить в конструктор")
+		log.Printf("TemplateList(): не удалось добавить в конструктор")
 	}
 }

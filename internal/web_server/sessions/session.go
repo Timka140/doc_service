@@ -14,9 +14,10 @@ import (
 )
 
 type ISession interface {
+	ID() int64
 	Authorization() bool
 	GetLogin() string
-	CherRights(in int) bool
+	Rights(in []int) bool
 	GetConn() *TConn
 	SendMessage(params map[string]interface{}) (err error)
 
@@ -43,6 +44,7 @@ type tOnline struct {
 }
 
 type TSession struct {
+	id    int64
 	token string
 	// Время закрытия сессии
 	update time.Time
@@ -62,25 +64,21 @@ func NewSession(hash string) (ISession, error) {
 		update: time.Now(),
 	}
 
-	var buf []byte
 	var user db.Users
 	err := db.DB.Table("users").Select("id, login, rights").Where("password = ? AND state = 1", hash).First(&user).Error
 	// err := db.DB.QueryRow("SELECT id, login, rights FROM users WHERE password = ? AND state = 1", hash).Scan(&t.id, &t.login, &buf)
 	switch err {
 	case sql.ErrNoRows:
+		time.Sleep(2 * time.Second)
 		return nil, nil
 	case nil:
 	default:
 		return nil, fmt.Errorf("NewSession(): чтение сессии, err=%w", err)
 	}
 
-	if len(buf) > 0 {
-		err = json.Unmarshal(buf, &t.rights)
-		if err != nil {
-			return nil, fmt.Errorf("NewSession(): распаковка прав, err=%w", err)
-		}
-	}
-
+	t.id = user.Id
+	t.login = user.Login
+	t.rights.SetDB(user.Rights)
 	t.authorization = true
 
 	go t.monitor()
@@ -125,6 +123,10 @@ func (t *TSession) monitor() {
 	}
 }
 
+func (t *TSession) ID() int64 {
+	return t.id
+}
+
 func (t *TSession) OpenSocket() {
 	t.online.online = true
 }
@@ -137,13 +139,8 @@ func (t *TSession) GetLogin() string {
 	return t.login
 }
 
-func (t *TSession) CherRights(in int) bool {
-	for _, v := range t.rights.Rights {
-		if v == in {
-			return true
-		}
-	}
-	return false
+func (t *TSession) Rights(in []int) bool {
+	return t.rights.Check(in)
 }
 
 func (t *TSession) Online() {

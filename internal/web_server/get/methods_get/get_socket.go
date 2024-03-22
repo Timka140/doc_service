@@ -80,6 +80,8 @@ func (t *TSocket) GetContext(c *gin.Context) {
 			switch ce.Code {
 			case websocket.CloseGoingAway:
 				close = true
+			case websocket.CloseAbnormalClosure:
+				close = true
 			default:
 				log.Printf("[ERROR] TSocket.GetContext(): чтение сообщения, err=%v", err)
 				close = true
@@ -97,7 +99,7 @@ func (t *TSocket) GetContext(c *gin.Context) {
 		var dataWs interface{}
 		err = json.Unmarshal(msg, &dataWs)
 		if err != nil {
-			log.Panicln(err)
+			// log.Println("[ERROR] RunUserSocket(): error marshal json", err)
 			break
 		}
 
@@ -173,7 +175,8 @@ func (t *TSocket) GetContext(c *gin.Context) {
 
 	err = conn.Close()
 	if err != nil {
-		log.Println("[ERROR] TSocket.GetContext(): error marshal json", err)
+		// log.Println("[ERROR] TSocket.GetContext(): error marshal json", err)
+		return
 	}
 }
 

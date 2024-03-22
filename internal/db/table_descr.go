@@ -11,6 +11,17 @@ type Users struct {
 	Password string
 	State    int64         `gorm:"type:int"`
 	Rights   pq.Int64Array `gorm:"type:[]int64"`
+	Comment  string
+}
+
+type Services struct {
+	Id      int64
+	Name    string
+	Key     string        `gorm:"type:string"`
+	UserID  int64         `gorm:"type:int64;column:user_id"`
+	State   int64         `gorm:"type:int"`
+	Rights  pq.Int64Array `gorm:"type:[]int64"`
+	Comment string
 }
 
 type Tasks struct {
@@ -29,13 +40,15 @@ type Task struct {
 }
 
 type Templates struct {
-	Id      int64
-	Path    string
-	Name    string
-	Tp      int
-	Comment string
-	Data    []byte
-	Hash    string
+	Id           int64
+	Path         string
+	Name         string
+	Tp           int
+	Comment      string
+	Data         []byte
+	Hash         string
+	UserID       int64 `gorm:"type:int64;column:user_id"`
+	Organization int64 `gorm:"type:int64;column:organization"`
 }
 
 type TemplateVersions struct {

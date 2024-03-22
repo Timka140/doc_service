@@ -2,13 +2,24 @@ package methods
 
 import (
 	"context"
+	"fmt"
 
+	"projects/doc/doc_service/internal/grpc_server/grpc_sessions"
 	pb "projects/doc/doc_service/pkg/transport/protocol"
 )
 
 // Info проверяет соединение и задержку.
 func (t *TMethods) Info(ctx context.Context, in *pb.InfoReq) (out *pb.InfoResp, err error) {
 	var pack []byte
+
+	ses := grpc_sessions.Ses.GetSes(in.SrvInfo.Token)
+	if ses == nil {
+		return nil, fmt.Errorf("Info(): Сервис неавторизованн")
+	}
+	if !ses.Authorization() {
+		return nil, fmt.Errorf("Info(): Сервис неавторизованн")
+	}
+
 	// data := make(map[string]interface{})
 
 	// func() {

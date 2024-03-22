@@ -11,7 +11,7 @@ import (
 )
 
 func TestPdf_Perform(t *testing.T) {
-	tr, err := transport.NewTransport("127.0.0.1:8030", &connect.TCreate{
+	tr, err := transport.NewTransport("127.0.0.1:8030", "5fb24be9-084a-4b34-80e5-28f21595bae6", &connect.TCreate{
 		Name:    "Test PDF",
 		Comment: "Тестовый запуск формирования PDF",
 	})
@@ -19,7 +19,7 @@ func TestPdf_Perform(t *testing.T) {
 		log.Println("создание транспорта", err)
 	}
 
-	doc1, err := os.ReadFile("index.html")
+	doc1, err := os.ReadFile("1.docx")
 	if err != nil {
 		log.Println("Загрузка документа", err)
 	}
@@ -32,8 +32,8 @@ func TestPdf_Perform(t *testing.T) {
 		Files: []*pdf.TFile{
 			{
 				FileData: doc1,
-				Ext:      "html",
-				Name:     "test_1",
+				Ext:      "docx",
+				Name:     "1",
 			},
 			// {
 			// 	FileData: doc2,

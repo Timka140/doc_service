@@ -9,6 +9,7 @@ import (
 )
 
 type TReport struct {
+	Token  string  `json:"token"`   // Ключ авторизации
 	Format string  `json:"formats"` // Формат отчета
 	Code   string  `json:"code"`    // Код шаблона для документа
 	Params TParams `json:"params"`  // Параметры объединения страницы
@@ -63,8 +64,9 @@ func (t *TMethods) GenerateReport(val TGenerateReports) (res *TGenerateReportRes
 
 	pb, err := t.conn.GenerateReport(context.Background(), &pb.ReportReq{
 		SrvAdr: &pb.ReportFormat{
-			Type: "Render",
-			Pack: val.Pack,
+			Token: t.token,
+			Type:  "Render",
+			Pack:  val.Pack,
 		},
 	})
 

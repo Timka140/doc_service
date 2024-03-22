@@ -31,7 +31,7 @@ func (t *TConnect) listenPing() {
 			time.Sleep(500 * time.Millisecond)
 
 			resp, err := t.conn.Ping(context.Background(), &pb.PingReq{
-				SrvPing: &pb.ServerPing{Sid: t.sid, Tm: time.Now().UnixMilli()},
+				SrvPing: &pb.ServerPing{Token: t.token, Tm: time.Now().UnixMilli()},
 			})
 			if err != nil {
 				log.Printf("connect.ping(): опрос сервера, err=%v", err)

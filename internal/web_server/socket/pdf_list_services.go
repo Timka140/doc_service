@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"projects/doc/doc_service/internal/pdf_service"
+	"projects/doc/doc_service/internal/web_server/sessions"
 
 	"github.com/google/uuid"
 )
@@ -11,18 +12,23 @@ import (
 type TListPdfServices struct {
 	data map[string]interface{}
 	pid  string
+	ses  sessions.ISession
 }
 
 func newListPdfServicesSocket(in *TSocketValue) (ISocket, error) {
 	t := &TListPdfServices{
 		data: in.Data,
 		pid:  uuid.NewString(),
+		ses:  in.Ses,
 	}
 
 	return t, nil
 }
 
 func (t *TListPdfServices) Start() error {
+	if !t.ses.Rights([]int{sessions.CAdministrator}) {
+		return nil
+	}
 
 	execution, ok := t.data["execution"].(string)
 	if !ok {

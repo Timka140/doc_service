@@ -1,4 +1,4 @@
-package sessions
+package grpc_sessions
 
 import (
 	"fmt"
@@ -7,12 +7,8 @@ import (
 )
 
 const (
-	CAdministrator = 1 // Администратор
-	CUser          = 2 //Пользователь
-	CGuest         = 3 // Статус гость
-
-	CCreatingTemplate = 41 // Разрешено создавать новые шаблоны
-	CUpdatingTemplate = 42 // Разрешено редактировать шаблоны
+	CRenderDocx = 1 // Генерация docx
+	CRenderPDF  = 2 // Конвертация в PDF
 )
 
 type TRights struct {
@@ -32,24 +28,14 @@ func (t *TRights) Set(rights map[string]interface{}) (*TRights, error) {
 
 	out := &TRights{}
 
-	administrator, ok := rights["administrator"].(bool)
+	administrator, ok := rights["docx"].(bool)
 	if ok {
-		out.update(administrator, CAdministrator)
+		out.update(administrator, CRenderDocx)
 	}
 
-	guest, ok := rights["guest"].(bool)
+	guest, ok := rights["pdf"].(bool)
 	if ok {
-		out.update(guest, CGuest)
-	}
-
-	creatingTemplate, ok := rights["creatingTemplate"].(bool)
-	if ok {
-		out.update(creatingTemplate, CCreatingTemplate)
-	}
-
-	updatingTemplate, ok := rights["updatingTemplate"].(bool)
-	if ok {
-		out.update(updatingTemplate, CUpdatingTemplate)
+		out.update(guest, CRenderPDF)
 	}
 
 	return out, nil
@@ -63,20 +49,12 @@ func (t *TRights) SetDB(val pq.Int64Array) {
 func (t *TRights) Vue() map[string]interface{} {
 	list := make(map[string]interface{})
 
-	if t.contains(CAdministrator) {
-		list["administrator"] = true
+	if t.contains(CRenderDocx) {
+		list["docx"] = true
 	}
 
-	if t.contains(CGuest) {
-		list["guest"] = true
-	}
-
-	if t.contains(CCreatingTemplate) {
-		list["creatingTemplate"] = true
-	}
-
-	if t.contains(CUpdatingTemplate) {
-		list["updatingTemplate"] = true
+	if t.contains(CRenderPDF) {
+		list["pdf"] = true
 	}
 
 	return list
@@ -135,8 +113,13 @@ func (t *TRights) update(val bool, key int) {
 func (t *TRights) Check(rights []int) bool {
 	val := false
 	for _, r := range rights {
-		if t.contains(r) {
-			val = true
+		for _, v := range t.Rights {
+			if r == v {
+				val = true
+				break
+			}
+		}
+		if val {
 			break
 		}
 	}

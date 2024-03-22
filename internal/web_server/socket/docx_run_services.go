@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"projects/doc/doc_service/internal/docx_service"
+	"projects/doc/doc_service/internal/web_server/sessions"
 	"strconv"
 	"sync"
 
@@ -13,18 +14,24 @@ import (
 type TRunDocxServices struct {
 	data map[string]interface{}
 	pid  string
+	ses  sessions.ISession
 }
 
 func newRunDocxServicesSocket(in *TSocketValue) (ISocket, error) {
 	t := &TRunDocxServices{
 		data: in.Data,
 		pid:  uuid.NewString(),
+		ses:  in.Ses,
 	}
 
 	return t, nil
 }
 
 func (t *TRunDocxServices) Start() error {
+	if !t.ses.Rights([]int{sessions.CAdministrator}) {
+		return nil
+	}
+
 	var err error
 	execution, ok := t.data["execution"].(string)
 	if !ok {

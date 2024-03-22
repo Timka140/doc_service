@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"projects/doc/doc_service/internal/grpc_server/grpc_sessions"
 	"projects/doc/doc_service/internal/monitor"
 	"projects/doc/doc_service/internal/render/csv"
 	"projects/doc/doc_service/internal/render/docx"
@@ -93,6 +94,11 @@ func (t *TRender) packReports(reports *methods.TGenerateReportGroup) (pack []byt
 }
 
 func (t *TRender) SelectRender(SrvAdr *pb.ReportFormat) (result []byte, err error) {
+	ses := grpc_sessions.Ses.GetSes(SrvAdr.Token)
+	if ses == nil || !ses.Authorization() {
+		return nil, fmt.Errorf("TRender.SelectRender(): сервис не авторизован")
+	}
+
 	reports, err := t.unpackReports(SrvAdr)
 	if err != nil {
 		return nil, fmt.Errorf("TRender.SelectRender(): инициация, err=%w", err)
@@ -107,6 +113,10 @@ func (t *TRender) SelectRender(SrvAdr *pb.ReportFormat) (result []byte, err erro
 		switch report.Format {
 		case cons.CExtDocOne:
 		case cons.CExtDocx:
+			if !ses.Rights([]int{grpc_sessions.CRenderDocx}) {
+				return nil, fmt.Errorf("TRender.SelectRender(): не достаточно прав")
+			}
+
 			err = t.docx.Render(report)
 			if err != nil {
 				return nil, fmt.Errorf("TRender.SelectRender(): выполнение docx, err=%w", err)
@@ -122,6 +132,9 @@ func (t *TRender) SelectRender(SrvAdr *pb.ReportFormat) (result []byte, err erro
 			report.File = t.xlsx.GetDocument()
 		case cons.CExtCsv:
 		case cons.CExtPdf:
+			if !ses.Rights([]int{grpc_sessions.CRenderPDF}) {
+				return nil, fmt.Errorf("TRender.SelectRender(): не достаточно прав")
+			}
 			err = t.pdf.Render(report)
 			if err != nil {
 				return nil, fmt.Errorf("TRender.SelectRender(): выполнение pdf, err=%w", err)

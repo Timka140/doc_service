@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"sync"
 
+	"github.com/lib/pq"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	// _ "github.com/mattn/go-sqlite3"
@@ -88,6 +89,7 @@ func (db *TDB) create_tables() error {
 			"password"	BLOB NOT NULL,
 			"rights"	BLOB NOT NULL,
 			"state"	INTEGER NOT NULL DEFAULT 0,
+			"comment"	TEXT,
 			PRIMARY KEY("id" AUTOINCREMENT)
 		);`,
 		"tasks": `CREATE TABLE "tasks" (
@@ -114,7 +116,9 @@ func (db *TDB) create_tables() error {
 			"tp"	INTEGER,
 			"comment"	TEXT,
 			"data"	BLOB,
-			"hash"	TEXT,
+			"hash"	REAL,
+			"user_id"	INTEGER NOT NULL DEFAULT 0,
+			"organization"	INTEGER,
 			PRIMARY KEY("id" AUTOINCREMENT)
 		);`,
 		"template_versions": `CREATE TABLE "template_versions" (
@@ -123,6 +127,17 @@ func (db *TDB) create_tables() error {
 			"template_id"	INTEGER NOT NULL,
 			"user"	TEXT,
 			"date_update"	TEXT,
+			PRIMARY KEY("id" AUTOINCREMENT)
+		);`,
+		"services": `CREATE TABLE "services" (
+			"id"	INTEGER NOT NULL UNIQUE,
+			"name"	TEXT NOT NULL,
+			"key"	BLOB NOT NULL UNIQUE,
+			"state"	INTEGER NOT NULL DEFAULT 0,
+			"rights"	BLOB,
+			"comment"	TEXT,
+			"user_id"	INTEGER NOT NULL DEFAULT 0,
+			"organization"	INTEGER,
 			PRIMARY KEY("id" AUTOINCREMENT)
 		);`,
 	}
@@ -153,15 +168,18 @@ func (db *TDB) default_user() error {
 	// 	return nil
 	// }
 
-	var id sql.NullInt64
+	var id int64
 	err = db.Table("users").Select("id").Where("login = ?", "bondarenkotg").Scan(&id).Error
 	// err = db.QueryRow("SELECT id FROM users WHERE login = 'bondarenkotg'").Scan(&id)
 	switch err {
 	case sql.ErrNoRows:
 	case nil:
-		return nil
 	default:
 		return fmt.Errorf("default_user(): поиск пользователя по умолчанию, err=%w", err)
+	}
+
+	if id != 0 {
+		return nil
 	}
 
 	login := "bondarenkotg"
@@ -169,11 +187,11 @@ func (db *TDB) default_user() error {
 	key := md5.Sum([]byte(fmt.Sprintf("%v:docGenerator:%v", login, password)))
 	hash := hex.EncodeToString(key[:])
 
-	err = db.Table("users").Create(Users{
+	err = db.Table("users").Create(&Users{
 		Login:    "bondarenkotg",
 		Password: hash,
 		State:    1,
-		Rights:   nil,
+		Rights:   pq.Int64Array{1},
 	}).Error
 	if err != nil {
 		return fmt.Errorf("default_user(): запись пользователя в базу, err=%w", err)

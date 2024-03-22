@@ -26,6 +26,9 @@ func newTaskCreateSocket(in *TSocketValue) (ISocket, error) {
 }
 
 func (t *TTaskCreate) Start() error {
+	if !t.ses.Rights([]int{sessions.CGuest}) {
+		return nil
+	}
 	var err error
 	execution, ok := t.data["execution"].(string)
 	if !ok {
