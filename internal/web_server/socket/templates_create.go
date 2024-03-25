@@ -3,6 +3,8 @@ package socket
 import (
 	"fmt"
 	"log"
+	"os"
+	"path/filepath"
 	"projects/doc/doc_service/internal/db"
 	"projects/doc/doc_service/internal/web_server/sessions"
 
@@ -131,6 +133,14 @@ func (t *TTemplatesCreate) remove() error {
 		id, ok := v["Id"].(float64)
 		if !ok {
 			continue
+		}
+
+		if tp == 2 {
+			catalog := filepath.Join("store/template", fmt.Sprintf("%v", id))
+			err := os.RemoveAll(catalog)
+			if err != nil {
+				return fmt.Errorf("TaskCreate.Start(): удаление каталога, err=%w", err)
+			}
 		}
 
 		if tp == 3 {

@@ -86,7 +86,7 @@ func (t *TSettingsServices) check_name() error {
 	if t.ses.Rights([]int{sessions.CAdministrator}) {
 		tx.Where("name = ?", name)
 	} else {
-		tx.Where("name = ? AND user_id", name, t.ses.ID())
+		tx.Where("name = ? AND user_id = ?", name, t.ses.ID())
 	}
 	err = tx.Scan(&row).Error
 	switch err {
@@ -198,14 +198,14 @@ func (t *TSettingsServices) update_service() error {
 		"state":   state,
 	}
 
-	tx := db.DB.Table("services").Updates(service)
+	tx := db.DB.Table("services")
 	if t.ses.Rights([]int{sessions.CAdministrator}) {
 		tx.Where("id = ?", id)
 	} else {
-		tx.Where("id = ? AND user_id", id, t.ses.ID())
+		tx.Where("id = ? AND user_id = ?", id, t.ses.ID())
 	}
 
-	switch tx.Error {
+	switch tx.Updates(service).Error {
 	case nil:
 	case sql.ErrNoRows:
 	default:
@@ -232,7 +232,7 @@ func (t *TSettingsServices) info_service() error {
 	if t.ses.Rights([]int{sessions.CAdministrator}) {
 		tx.Where("id = ?", id)
 	} else {
-		tx.Where("id = ? AND user_id", id, t.ses.ID())
+		tx.Where("id = ? AND user_id = ?", id, t.ses.ID())
 	}
 	switch tx.Scan(&service).Error {
 	case nil:

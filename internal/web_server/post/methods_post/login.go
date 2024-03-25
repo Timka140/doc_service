@@ -100,6 +100,7 @@ func (t *TLoginPost) GetContext(c *gin.Context) {
 	resp := map[string]interface{}{
 		"status":    1,
 		"token":     ses.Token(),
+		"rights":    ses.RightsVue(),
 		"name":      "",
 		"last_name": "",
 		"message":   "",

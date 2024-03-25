@@ -18,6 +18,7 @@ type ISession interface {
 	Authorization() bool
 	GetLogin() string
 	Rights(in []int) bool
+	RightsVue() map[string]interface{}
 	GetConn() *TConn
 	SendMessage(params map[string]interface{}) (err error)
 
@@ -141,6 +142,9 @@ func (t *TSession) GetLogin() string {
 
 func (t *TSession) Rights(in []int) bool {
 	return t.rights.Check(in)
+}
+func (t *TSession) RightsVue() map[string]interface{} {
+	return t.rights.Vue()
 }
 
 func (t *TSession) Online() {
